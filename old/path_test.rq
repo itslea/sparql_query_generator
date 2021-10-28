@@ -1,0 +1,10 @@
+SELECT * WHERE { <http://en.wikipedia.org/wiki/Collateral_circulation> <http://xmlns.com/foaf/0.1/primaryTopic> ?o1 . ?o1 <http://dbpedia.org/ontology/wikiPageRevisionID> ?o2 .}
+SELECT * WHERE { <http://en.wikipedia.org/wiki/Collegium_Charter_School> <http://xmlns.com/foaf/0.1/primaryTopic> ?o1 . ?o1 <http://dbpedia.org/ontology/mascot> ?o2 .}
+SELECT * WHERE { ?s1 <http://xmlns.com/foaf/0.1/primaryTopic> ?o1 . ?o1 <http://dbpedia.org/ontology/wikiPageWikiLink> ?o2 .}
+SELECT * WHERE { ?s1 <http://xmlns.com/foaf/0.1/primaryTopic> ?o1 . ?o1 <http://dbpedia.org/property/currentMembers> "Flávia Maia"@en .}
+SELECT * WHERE { <http://dbpedia.org/resource/Charles_Barlow_(businessman)> <http://dbpedia.org/ontology/birthPlace> ?o1 . ?o1 <http://dbpedia.org/ontology/wikiPageWikiLink> ?o2 .}
+SELECT * WHERE { ?s1 <http://dbpedia.org/ontology/birthPlace> ?o1 . ?o1 <http://dbpedia.org/ontology/wikiPageWikiLink> ?o2 .}
+SELECT * WHERE { ?s1 <http://dbpedia.org/ontology/wikiPageWikiLink> ?o1 . ?o1 <http://xmlns.com/foaf/0.1/depiction> <http://commons.wikimedia.org/wiki/Special:FilePath/Arms_of_Sir_Colin_Cole.svg> .}
+SELECT * WHERE { ?s1 <http://dbpedia.org/ontology/wikiPageWikiLink> ?o1 . ?o1 <http://dbpedia.org/property/wikiPageUsesTemplate> ?o2 .}
+SELECT * WHERE { <http://dbpedia.org/resource/Mircea_Eliade> <http://dbpedia.org/ontology/wikiPageWikiLink> ?o1 . ?o1 <http://dbpedia.org/ontology/wikiPageWikiLink> ?o2 .}
+SELECT * WHERE { <http://dbpedia.org/resource/Glottopedia> <http://dbpedia.org/ontology/wikiPageWikiLink> ?o1 . ?o1 <http://xmlns.com/foaf/0.1/depiction> <http://commons.wikimedia.org/wiki/Special:FilePath/Bromley_north_line.png> .}
