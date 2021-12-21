@@ -71,24 +71,25 @@ def create_query_shape(endpoint_data, triples, var_prob):
 
     return query_shape
 
+
 def create_union_string(union_patterns):
     union_str = "{ "
     part1_len = random.randint(1, len(union_patterns) - 1)
-    part2_len = len(union_patterns) - part1_len
+
     for i in range(0, part1_len):
         union_str += union_patterns[i] + " "
     union_str += "} UNION { "
     for i in range(part1_len, len(union_patterns)):
         union_str += union_patterns[i] + " "
     union_str += "} "
-    
+
     return union_str
 
 
 def create_optional_string(optional_patterns):
     optional_str = "OPTIONAL { "
-    for i in range(0, len(optional_patterns)):
-        optional_str += optional_patterns[i] + " "
+    for elem in optional_patterns:
+        optional_str += elem + " "
     optional_str += "} "
 
     return optional_str
@@ -96,13 +97,13 @@ def create_optional_string(optional_patterns):
 
 def create_shape_string(rest_patterns):
     rest_str = ""
-    for i in range(0, len(rest_patterns)):
-        rest_str += rest_patterns[i] + " "
+    for elem in rest_patterns:
+        rest_str += elem + " "
 
     return rest_str
 
 
-def create_operators(triples, operator_prob): 
+def create_operators(triples, operator_prob):
     """Creates the operators."""
     where_str = "WHERE { "
     bool_distinct = False
@@ -179,6 +180,34 @@ def create_operators(triples, operator_prob):
             print(optional_patterns)
 
             where_str += create_shape_string(rest_patterns) + create_union_string(union_patterns) + create_optional_string(optional_patterns)
+
+    elif bool_optional:
+        o = random.randint(1, triples)
+        r = triples - o
+
+        rest_patterns = []
+        for i in range(0, r):
+            rest_patterns.append(patterns[i])
+
+        optional_patterns = []
+        for i in range(r, triples):
+            optional_patterns.append(patterns[i])
+
+        where_str += create_shape_string(rest_patterns) + create_optional_string(optional_patterns)
+
+    elif bool_union:
+        u = random.randint(2, triples)
+        r = triples - u
+
+        rest_patterns = []
+        for i in range(0, r):
+            rest_patterns.append(patterns[i])
+
+        union_patterns = []
+        for i in range(r, triples):
+            union_patterns.append(patterns[i])
+
+        where_str += create_shape_string(rest_patterns) + create_union_string(union_patterns)
 
     where_str += "}"
     return where_str
