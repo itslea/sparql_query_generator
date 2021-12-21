@@ -1,6 +1,8 @@
 import random
 import requests
 
+patterns = ["?s1 ?p1 ?o1 .", "?s1 ?p2 ?o2 .", "?s1 ?p3 ?o3 .", "?s1 ?p4 ?o4 ."]  # patterns is a list of strings containing the triple patterns with size = n
+
 
 def fetch_data(triples):
     """Fetches data from SPAQRL endpoint."""
@@ -68,6 +70,118 @@ def create_query_shape(endpoint_data, triples, var_prob):
         query_shape += subject + ' ' + predicate + ' ' + objectt + ' . '
 
     return query_shape
+
+def create_union_string(union_patterns):
+    union_str = "{ "
+    part1_len = random.randint(1, len(union_patterns) - 1)
+    part2_len = len(union_patterns) - part1_len
+    for i in range(0, part1_len):
+        union_str += union_patterns[i] + " "
+    union_str += "} UNION { "
+    for i in range(part1_len, len(union_patterns)):
+        union_str += union_patterns[i] + " "
+    union_str += "} "
+    
+    return union_str
+
+
+def create_optional_string(optional_patterns):
+    optional_str = "OPTIONAL { "
+    for i in range(0, len(optional_patterns)):
+        optional_str += optional_patterns[i] + " "
+    optional_str += "} "
+
+    return optional_str
+
+
+def create_shape_string(rest_patterns):
+    rest_str = ""
+    for i in range(0, len(rest_patterns)):
+        rest_str += rest_patterns[i] + " "
+
+    return rest_str
+
+
+def create_operators(triples, operator_prob): 
+    """Creates the operators."""
+    where_str = "WHERE { "
+    bool_distinct = False
+    bool_optional = False
+    bool_union = False
+
+    if triples >= 3:
+        if random.random() <= operator_prob: bool_distinct = True
+        if random.random() <= operator_prob: bool_optional = True
+        if random.random() <= operator_prob: bool_union = True
+    else:
+        if triples == 2:
+            if random.random() <= operator_prob: bool_distinct = True
+            if random.random() <= operator_prob: bool_union = True
+        elif triples == 1:
+            if random.random() <= operator_prob: bool_distinct = True
+            if random.random() <= operator_prob: bool_optional = True
+    
+    if bool_distinct:
+        print("TODO")
+
+    if bool_optional and bool_union:
+        print("HIERRRRR")
+        chooseFirst = ["optional", "union"]
+        first = random.choices(chooseFirst)
+
+        first[0] == "optional"
+        # Divide patterns durch 3 -> optional, union, rest
+        if first[0] == "optional":
+            o = random.randint(1, triples - 2)
+            u = random.randint(2, triples - o)
+            r = triples - o - u
+
+            rest_patterns = []
+            for i in range(0, r):
+                rest_patterns.append(patterns[i])
+            print("rest " + str(r) + " :")
+            print(rest_patterns)
+
+            optional_patterns = []
+            for i in range(r, r + o):
+                optional_patterns.append(patterns[i])
+            print("optional " + str(o) + " :")
+            print(optional_patterns)
+
+            union_patterns = []
+            for i in range(r + o, triples):
+                union_patterns.append(patterns[i])
+            print("union " + str(u) + " :")
+            print(union_patterns)
+
+            where_str += create_shape_string(rest_patterns) + create_optional_string(optional_patterns) + create_union_string(union_patterns)
+        else:
+            u = random.randint(2, triples - 1)
+            o = random.randint(1, triples - u)
+            r = triples - o - u
+
+            rest_patterns = []
+            for i in range(0, r):
+                rest_patterns.append(patterns[i])
+            print("rest " + str(r) + " :")
+            print(rest_patterns)
+
+            union_patterns = []
+            for i in range(r, r + u):
+                union_patterns.append(patterns[i])
+            print("union " + str(u) + " :")
+            print(union_patterns)
+
+            optional_patterns = []
+            for i in range(r + u, triples):
+                optional_patterns.append(patterns[i])
+            print("optional " + str(o) + " :")
+            print(optional_patterns)
+
+            where_str += create_shape_string(rest_patterns) + create_union_string(union_patterns) + create_optional_string(optional_patterns)
+
+    where_str += "}"
+    return where_str
 
 
 def generate_query(queries, triples, operator_prob, var_prob):
