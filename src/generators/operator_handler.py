@@ -2,6 +2,8 @@ import random
 
 
 def create_union_string(union_patterns):
+    """Creates string for UNION operator"""
+
     union_str = "{ "
     part1_len = random.randint(1, len(union_patterns) - 1)
 
@@ -16,6 +18,8 @@ def create_union_string(union_patterns):
 
 
 def create_optional_string(optional_patterns):
+    """Creates string for OPTIONAL operator"""
+
     optional_str = "OPTIONAL { "
     for elem in optional_patterns:
         optional_str += elem + " "
@@ -25,6 +29,7 @@ def create_optional_string(optional_patterns):
 
 
 def create_shape_string(rest_patterns):
+    """Creates string for SHAPE criteria"""
     rest_str = ""
     for elem in rest_patterns:
         rest_str += elem + " "
@@ -33,33 +38,39 @@ def create_shape_string(rest_patterns):
 
 
 def create_operators(triples, operator_prob, patterns):
-    """Creates the operators."""
+    """Creates the operators UNION and DISTINCT."""
     where_str = "WHERE { "
     bool_distinct = False
     bool_optional = False
     bool_union = False
 
     if triples >= 3:
-        if random.random() <= operator_prob: bool_distinct = True
-        if random.random() <= operator_prob: bool_optional = True
-        if random.random() <= operator_prob: bool_union = True
+        if random.random() <= operator_prob:
+            bool_distinct = True
+        if random.random() <= operator_prob:
+            bool_optional = True
+        if random.random() <= operator_prob:
+            bool_union = True
     else:
         if triples == 2:
-            if random.random() <= operator_prob: bool_distinct = True
-            if random.random() <= operator_prob: bool_union = True
+            if random.random() <= operator_prob:
+                bool_distinct = True
+            if random.random() <= operator_prob:
+                bool_union = True
         elif triples == 1:
-            if random.random() <= operator_prob: bool_distinct = True
-            if random.random() <= operator_prob: bool_optional = True
+            if random.random() <= operator_prob:
+                bool_distinct = True
+            if random.random() <= operator_prob:
+                bool_optional = True
 
     if bool_distinct:
         print("TODO")
 
     if bool_optional and bool_union:
-        print("HIERRRRR")
-        chooseFirst = ["optional", "union"]
-        first = random.choices(chooseFirst)
+        choose_first = ["optional", "union"]
+        first = random.choices(choose_first)
 
-        # Divide patterns durch 3 -> optional, union, rest
+        # Divide patterns by 3 -> optional, union, rest
         if first[0] == "optional":
             o = random.randint(1, triples - 2)
             u = random.randint(2, triples - o)
