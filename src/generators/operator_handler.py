@@ -1,6 +1,14 @@
 import random
 
 
+def create_select_distinct(operator_prob):
+    """Creates string for SELECT (DISTINCT)"""
+    if random.random() <= operator_prob:
+        return "SELECT DISTINCT"
+    else:
+        return "SELECT"
+
+
 def create_union_string(union_patterns):
     """Creates string for UNION operator"""
 
@@ -40,13 +48,10 @@ def create_shape_string(rest_patterns):
 def create_operators(triples, operator_prob, patterns):
     """Creates the operators UNION and DISTINCT."""
     where_str = "WHERE { "
-    bool_distinct = False
     bool_optional = False
     bool_union = False
 
     if triples >= 3:
-        if random.random() <= operator_prob:
-            bool_distinct = True
         if random.random() <= operator_prob:
             bool_optional = True
         if random.random() <= operator_prob:
@@ -54,17 +59,10 @@ def create_operators(triples, operator_prob, patterns):
     else:
         if triples == 2:
             if random.random() <= operator_prob:
-                bool_distinct = True
-            if random.random() <= operator_prob:
                 bool_union = True
         elif triples == 1:
             if random.random() <= operator_prob:
-                bool_distinct = True
-            if random.random() <= operator_prob:
                 bool_optional = True
-
-    if bool_distinct:
-        print("TODO")
 
     if bool_optional and bool_union:
         choose_first = ["optional", "union"]
@@ -79,20 +77,14 @@ def create_operators(triples, operator_prob, patterns):
             rest_patterns = []
             for i in range(0, r):
                 rest_patterns.append(patterns[i])
-            print("rest " + str(r) + " :")
-            print(rest_patterns)
 
             optional_patterns = []
             for i in range(r, r + o):
                 optional_patterns.append(patterns[i])
-            print("optional " + str(o) + " :")
-            print(optional_patterns)
 
             union_patterns = []
             for i in range(r + o, triples):
                 union_patterns.append(patterns[i])
-            print("union " + str(u) + " :")
-            print(union_patterns)
 
             where_str += create_shape_string(rest_patterns) + create_optional_string(optional_patterns) + create_union_string(union_patterns)
         else:
@@ -103,20 +95,14 @@ def create_operators(triples, operator_prob, patterns):
             rest_patterns = []
             for i in range(0, r):
                 rest_patterns.append(patterns[i])
-            print("rest " + str(r) + " :")
-            print(rest_patterns)
 
             union_patterns = []
             for i in range(r, r + u):
                 union_patterns.append(patterns[i])
-            print("union " + str(u) + " :")
-            print(union_patterns)
 
             optional_patterns = []
             for i in range(r + u, triples):
                 optional_patterns.append(patterns[i])
-            print("optional " + str(o) + " :")
-            print(optional_patterns)
 
             where_str += create_shape_string(rest_patterns) + create_union_string(union_patterns) + create_optional_string(optional_patterns)
 
@@ -147,6 +133,9 @@ def create_operators(triples, operator_prob, patterns):
             union_patterns.append(patterns[i])
 
         where_str += create_shape_string(rest_patterns) + create_union_string(union_patterns)
+
+    else:
+        where_str += create_shape_string(patterns)
 
     where_str += "}"
     return where_str

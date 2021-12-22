@@ -6,7 +6,7 @@ import generators.star_subject_generator as ssg
 print(ssg.generate_query(1, 4, 0.9, 0.5))
 
 #  x = DataHandler()
-#  query = "select distinct ?person where {?person foaf:name ?name .} LIMIT 10000" 
+#  query = "select distinct ?person where {?person foaf:name ?name .} LIMIT 10000"
 #  data = x.fetch_data(query)         #Parameter = query
 #  print(data)
 #  print("Measured Time: " + x.getTotalTime() + 's')
