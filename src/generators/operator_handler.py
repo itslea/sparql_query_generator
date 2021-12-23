@@ -1,6 +1,25 @@
 import random
 
 
+def choose_select_variables(variables):
+    """Chooses random variables for SELECT (DISTINCT)"""
+
+    choosen_variables = ""
+    all_or_variables = ["all", "variables"]
+    choose_all = random.choice(all_or_variables)
+    if choose_all[0] == "all":
+        choosen_variables = "*"
+    else:
+        random_variables = random.sample(variables, k=random.randint(1, len(variables) - 1))
+        for elem in random_variables:
+            if not random_variables.index(elem) == len(random_variables) - 1:
+                choosen_variables += elem + ", "
+            else:
+                choosen_variables += elem
+
+    return choosen_variables
+
+
 def create_select_distinct(operator_prob):
     """Creates string for SELECT (DISTINCT)"""
     if random.random() <= operator_prob:
@@ -66,7 +85,7 @@ def create_operators(triples, operator_prob, patterns):
 
     if bool_optional and bool_union:
         choose_first = ["optional", "union"]
-        first = random.choices(choose_first)
+        first = random.choice(choose_first)
 
         # Divide patterns by 3 -> optional, union, rest
         if first[0] == "optional":

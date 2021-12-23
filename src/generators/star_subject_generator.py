@@ -19,7 +19,7 @@ def create_triple_patterns(endpoint_data, var_prob):
     else:
         if subject['type'] == 'uri':
             subject = '<' + subject['value'] + '>'
-        # elif(subject['type' == ]) blank node
+        # TODO: elif(subject['type' == ]) blank node
 
     for elem in endpoint_data:
         predicate = elem['p']
@@ -47,23 +47,9 @@ def create_triple_patterns(endpoint_data, var_prob):
                 else:
                     objectt = '\"' + objectt['value'] + '\"' + "^^<" + objectt['datatype'] + ">"
             # elif blank node
-        patterns.append(subject + ' ' + predicate + ' ' + objectt + ' . ')
+        patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
 
     return {"patterns": patterns, "variables": variables}
-
-
-def choose_select_variables(variables):
-    """Chooses random variables for SELECT (DISTINCT)"""
-
-    choosen_variables = ""
-    random_variables = random.choices(variables)
-    for elem in random_variables:
-        if not random_variables.index(elem) == len(random_variables) - 1:
-            choosen_variables += elem + ", "
-        else:
-            choosen_variables += elem
-
-    return choosen_variables
 
 
 def generate_query(queries, triples, operator_prob, var_prob):
@@ -77,7 +63,7 @@ def generate_query(queries, triples, operator_prob, var_prob):
         variables = patternandvar['variables']
         where = oh.create_operators(triples, operator_prob, patterns)
         select = oh.create_select_distinct(operator_prob)
-        choosen_variables = choose_select_variables(variables)
+        choosen_variables = oh.choose_select_variables(variables)
         query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
 
     else:
