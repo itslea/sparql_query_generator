@@ -7,6 +7,8 @@ def choose_select_variables(variables):
     choosen_variables = ""
     all_or_variables = ["all", "variables"]
     choose_all = random.choice(all_or_variables)
+    if len(variables) == 1:
+        choose_all = all_or_variables[0]
     if choose_all[0] == "all":
         choosen_variables = "*"
     else:

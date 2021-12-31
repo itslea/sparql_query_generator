@@ -4,8 +4,16 @@ import generators.star_object_generator as sog
 import generators.path_generator as pg
 from generators.data_handler import DataHandler
 
-queries = pg.generate_query(10, 5, 0.7, 0.5)
-for elem in queries:
+# queries = pg.generate_query(10, 5, 0.7, 0.5)
+# for elem in queries:
+#     print(elem + '\n')
+
+# queries2 = ssg.generate_query(10, 5, 0.7, 0.5)
+# for elem in queries2:
+#     print(elem + '\n')
+
+queries3 = sog.generate_query(10, 5, 0.5, 0.5)
+for elem in queries3:
     print(elem + '\n')
 
 #print(ssg.generate_query(1, 4, 0.1, 0.5))

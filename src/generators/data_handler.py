@@ -10,12 +10,16 @@ class DataHandler:
         self.default_graph_uri = 'default-graph-uri='
         self.timeout = str(0)
         self.total_time = 0
+        self.limit = "100"
 
     def fetch_data_subject(self, triples):
         """Fetches data from SPARQL endpoint for star-subject-generator"""
 
+        if triples > 100:
+            self.limit = str(triples)
+
         #  Gets subject that fulfills minimum shape criteria
-        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o1. ?s ?p2 ?o2. FILTER(?o1 != ?o2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o1))} LIMIT 100"
+        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o1. ?s ?p2 ?o2. FILTER(?o1 != ?o2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o1))} LIMIT " + self.limit
         start_time = time.time()
         result = requests.get(self.adress, params={'format': 'json', 'query': query})
         end_time = time.time()
@@ -42,9 +46,11 @@ class DataHandler:
     def fetch_data_object(self, triples):
         """Fetches data from SPARQL endpoint for star-object-generator"""
 
+        if triples > 100:
+            self.limit = str(triples)
+
         #  Gets object that fulfills minimum shape criteria
-        query = "SELECT DISTINCT * FROM <http://dbpedia.org> WHERE {?s1 ?p1 ?o. ?s2 ?p2 ?o. FILTER(?p1 != rdf:type && ?p2 != rdf:type) FILTER(?s1 != ?s2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s1, ?p1, ?o))} LIMIT 100"
-        print(query)
+        query = "SELECT DISTINCT * FROM <http://dbpedia.org> WHERE {?s1 ?p1 ?o. ?s2 ?p2 ?o. FILTER(?p1 != rdf:type && ?p2 != rdf:type) FILTER(?s1 != ?s2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s1, ?p1, ?o))} LIMIT " + self.limit
         start_time = time.time()
         result = requests.get(self.adress, params={'format': 'json', 'query': query})
         end_time = time.time()
@@ -54,7 +60,6 @@ class DataHandler:
         endpoint_data = result.json()
         o = random.randint(0, 99)
         choosen_object = endpoint_data['results']['bindings'][o]['o']
-        print(choosen_object)
         object_type = ""
         if choosen_object['type'] == 'uri':
             object_type = '<' + choosen_object['value'] + '>'
@@ -66,7 +71,7 @@ class DataHandler:
             else:
                 object_type = '\"' + choosen_object['value'] + '\"' + "^^<" + choosen_object['datatype'] + ">"
         # TODO: elif blank node
-        second_query = "SELECT DISTINCT ?s, ?p FROM <http://dbpedia.org> WHERE {?s ?p " + object_type + " .} LIMIT 100"
+        second_query = "SELECT DISTINCT ?s, ?p FROM <http://dbpedia.org> WHERE {?s ?p " + object_type + " .} LIMIT " + self.limit
         second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
         second_data = second_result.json()
         pands = second_data['results']['bindings']
@@ -82,7 +87,10 @@ class DataHandler:
     def fetch_data_path(self, triples):
         """Fetches data from SPARQL endpoint for path-generator"""
 
-        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o. ?o ?p2 ?o2. FILTER(?p1 != ?p2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o))} LIMIT 100"
+        if triples > 100:
+            self.limit = str(triples)
+
+        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o. ?o ?p2 ?o2. FILTER(?p1 != ?p2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o))} LIMIT " + self.limit
         start_time = time.time()
         result = requests.get(self.adress, params={'format': 'json', 'query': query})
 
@@ -96,14 +104,14 @@ class DataHandler:
         loopcounter = 0
         choosen_subject = endpoint_data['results']['bindings'][s]['s']
         while loopcounter < triples:
-            second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . ?o ?p1 ?o1 . FILTER(?o != ?o1)} LIMIT 100"
+            second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . ?o ?p1 ?o1 . FILTER(?o != ?o1)} LIMIT " + self.limit
             second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
             second_data = second_result.json()
             pando = second_data['results']['bindings']
-            lenght_of_pando = len(pando) - 1
-            if lenght_of_pando <= 0:
+            len_pando = len(pando) - 1
+            if len_pando <= 0:
                 break
-            select_pando_pointer = random.randint(0, lenght_of_pando)
+            select_pando_pointer = random.randint(0, len_pando)
             if pando[select_pando_pointer]['o']['type'] == "uri":
                 new_obj = {"s": choosen_subject, "p": pando[select_pando_pointer]['p'], "o": pando[select_pando_pointer]['o']}
                 patterns.append(new_obj)
