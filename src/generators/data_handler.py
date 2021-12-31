@@ -81,8 +81,37 @@ class DataHandler:
 
     def fetch_data_path(self, triples):
         """Fetches data from SPARQL endpoint for path-generator"""
-        # TODO
+        
+        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o1. ?s ?p2 ?o2. FILTER(?o1 != ?o2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o1))} LIMIT 100"
+        start_time = time.time()
+        result = requests.get(self.adress, params={'format': 'json', 'query': query})
+
+        end_time = time.time()
+        needed_time = end_time - start_time
+        self.total_time += needed_time
+
+        endpoint_data = result.json()
+        s = random.randint(0, 99)
         patterns = []
+        loopcounter = 0
+        choosen_subject = endpoint_data['results']['bindings'][s]['s']
+        choosen_subject_value = choosen_subject['value']
+        while loopcounter < triples:
+            second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject_value + "> ?p ?o . <" + choosen_subject_value + "> ?p1 ?o1 . FILTER(?o != ?o1)}"
+            second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
+            second_data = second_result.json()
+            pando = second_data['results']['bindings']
+            lenght_of_pando = len(pando)-1
+            if lenght_of_pando <= 0:
+                raise ValueError('Something went wrong. Cant read values')
+                break
+            select_pando_pointer = random.randint(0,lenght_of_pando)
+            if pando[select_pando_pointer]['o']['type'] == "uri":
+                new_obj = {"s": choosen_subject, "p": pando[select_pando_pointer]['p']['value'], "o": pando[select_pando_pointer]['o']['value']}
+                patterns.append(new_obj)
+                choosen_subject_value = pando[select_pando_pointer]['o']['value']
+                loopcounter = loopcounter + 1
+    
         return patterns
 
     def get_total_time(self):
