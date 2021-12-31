@@ -10,16 +10,16 @@ class DataHandler:
         self.default_graph_uri = 'default-graph-uri='
         self.timeout = str(0)
         self.total_time = 0
-        self.limit = "100"
+        self.limit = 100
 
     def fetch_data_subject(self, triples):
         """Fetches data from SPARQL endpoint for star-subject-generator"""
 
         if triples > 100:
-            self.limit = str(triples)
+            self.limit = triples
 
         #  Gets subject that fulfills minimum shape criteria
-        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o1. ?s ?p2 ?o2. FILTER(?o1 != ?o2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o1))} LIMIT " + self.limit
+        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o1. ?s ?p2 ?o2. FILTER(?o1 != ?o2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o1))} LIMIT " + str(self.limit)
         start_time = time.time()
         result = requests.get(self.adress, params={'format': 'json', 'query': query})
         end_time = time.time()
@@ -27,7 +27,7 @@ class DataHandler:
         self.total_time += needed_time
 
         endpoint_data = result.json()
-        s = random.randint(0, 99)
+        s = random.randint(0, self.limit - 1)
         choosen_subject = endpoint_data['results']['bindings'][s]['s']
         second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . }"
         second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
@@ -47,10 +47,10 @@ class DataHandler:
         """Fetches data from SPARQL endpoint for star-object-generator"""
 
         if triples > 100:
-            self.limit = str(triples)
+            self.limit = triples
 
         #  Gets object that fulfills minimum shape criteria
-        query = "SELECT DISTINCT * FROM <http://dbpedia.org> WHERE {?s1 ?p1 ?o. ?s2 ?p2 ?o. FILTER(?p1 != rdf:type && ?p2 != rdf:type) FILTER(?s1 != ?s2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s1, ?p1, ?o))} LIMIT " + self.limit
+        query = "SELECT DISTINCT * FROM <http://dbpedia.org> WHERE {?s1 ?p1 ?o. ?s2 ?p2 ?o. FILTER(?p1 != rdf:type && ?p2 != rdf:type) FILTER(?s1 != ?s2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s1, ?p1, ?o))} LIMIT " + str(self.limit)
         start_time = time.time()
         result = requests.get(self.adress, params={'format': 'json', 'query': query})
         end_time = time.time()
@@ -58,7 +58,7 @@ class DataHandler:
         self.total_time += needed_time
 
         endpoint_data = result.json()
-        o = random.randint(0, 99)
+        o = random.randint(0, self.limit - 1)
         choosen_object = endpoint_data['results']['bindings'][o]['o']
         object_type = ""
         if choosen_object['type'] == 'uri':
@@ -71,7 +71,7 @@ class DataHandler:
             else:
                 object_type = '\"' + choosen_object['value'] + '\"' + "^^<" + choosen_object['datatype'] + ">"
         # TODO: elif blank node
-        second_query = "SELECT DISTINCT ?s, ?p FROM <http://dbpedia.org> WHERE {?s ?p " + object_type + " .} LIMIT " + self.limit
+        second_query = "SELECT DISTINCT ?s, ?p FROM <http://dbpedia.org> WHERE {?s ?p " + object_type + " .} LIMIT " + str(self.limit)
         second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
         second_data = second_result.json()
         pands = second_data['results']['bindings']
@@ -88,9 +88,9 @@ class DataHandler:
         """Fetches data from SPARQL endpoint for path-generator"""
 
         if triples > 100:
-            self.limit = str(triples)
+            self.limit = triples
 
-        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o. ?o ?p2 ?o2. FILTER(?p1 != ?p2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o))} LIMIT " + self.limit
+        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o. ?o ?p2 ?o2. FILTER(?p1 != ?p2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o))} LIMIT " + str(self.limit)
         start_time = time.time()
         result = requests.get(self.adress, params={'format': 'json', 'query': query})
 
@@ -99,12 +99,12 @@ class DataHandler:
         self.total_time += needed_time
 
         endpoint_data = result.json()
-        s = random.randint(0, 99)
+        s = random.randint(0, self.limit - 1)
         patterns = []
         loopcounter = 0
         choosen_subject = endpoint_data['results']['bindings'][s]['s']
         while loopcounter < triples:
-            second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . ?o ?p1 ?o1 . FILTER(?o != ?o1)} LIMIT " + self.limit
+            second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . ?o ?p1 ?o1 . FILTER(?o != ?o1)} LIMIT " + str(self.limit)
             second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
             second_data = second_result.json()
             pando = second_data['results']['bindings']
