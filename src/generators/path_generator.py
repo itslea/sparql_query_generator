@@ -12,18 +12,23 @@ def create_triple_patterns(endpoint_data, var_prob):
     patterns = []
     variables = []
 
-    subject = endpoint_data[0]['s']
-    if random.random() <= var_prob:
-        subject = '?s'
-        variables.append(subject)
-    else:
-        if subject['type'] == 'uri':
-            subject = '<' + subject['value'] + '>'
-        # TODO: elif(subject['type' == ]) blank node
+    is_first = endpoint_data[0]
+    temp_var = "?o"
+    path_is_var = random.random() <= var_prob
 
     for elem in endpoint_data:
+        subject = elem['s']
         predicate = elem['p']
         objectt = elem['o']
+
+        if path_is_var and is_first == elem:
+            subject = '?s'
+            variables.append(subject)
+        elif path_is_var:
+            subject = temp_var
+        else:
+            if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                subject = '<' + subject['value'] + '>'
 
         if random.random() <= var_prob:
             predicate = '?p' + str(pred_var_counter)
@@ -32,9 +37,12 @@ def create_triple_patterns(endpoint_data, var_prob):
         else:
             predicate = '<' + predicate['value'] + '>'
 
-        if random.random() <= var_prob:
+        path_is_var = random.random() <= var_prob
+
+        if path_is_var:
             objectt = '?o' + str(obj_var_counter)
             variables.append(objectt)
+            temp_var = '?o' + str(obj_var_counter)
             obj_var_counter += 1
         else:
             if objectt['type'] == 'uri':
@@ -46,7 +54,7 @@ def create_triple_patterns(endpoint_data, var_prob):
                     objectt = str(objectt['value'])
                 else:
                     objectt = '\"' + objectt['value'] + '\"' + "^^<" + objectt['datatype'] + ">"
-            # elif blank node
+            # TODO: elif blank node
         patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
 
     return {"patterns": patterns, "variables": variables}
@@ -54,19 +62,24 @@ def create_triple_patterns(endpoint_data, var_prob):
 
 def generate_query(queries, triples, operator_prob, var_prob):
     """Generates query."""
-    
-    query = ''
-    endpoint_data = dh.DataHandler().fetch_data_path(triples)
-    if len(endpoint_data) > 0:
-        patternandvar = create_triple_patterns(endpoint_data, var_prob)
-        patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
-        variables = patternandvar['variables']
-        where = oh.create_operators(triples, operator_prob, patterns)
-        select = oh.create_select_distinct(operator_prob)
-        choosen_variables = oh.choose_select_variables(variables)
-        query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
 
-    else:
-        print("STOP, ZU WENIG TRIPLE IN GRAPH")  # TODO: was passiert dann? X Versuche werden durchgeführt bis abbruch
+    all_queries = []
+    try_counter = 0
+    limit_tries = 100
+    while len(all_queries) < queries:
+        if try_counter > limit_tries:
+            break
+        query = ''
+        endpoint_data = dh.DataHandler().fetch_data_path(triples)
+        try_counter += 1
+        if len(endpoint_data) >= triples:
+            patternandvar = create_triple_patterns(endpoint_data, var_prob)
+            patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
+            variables = patternandvar['variables']
+            where = oh.create_operators(triples, operator_prob, patterns)
+            select = oh.create_select_distinct(operator_prob)
+            choosen_variables = oh.choose_select_variables(variables)
+            query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
+            all_queries.append(query)
 
-    return query
+    return all_queries

@@ -72,8 +72,8 @@ class DataHandler:
         pands = second_data['results']['bindings']
         patterns = []
         if len(pands) >= triples:
-            choosen_pando = random.sample(pands, k=triples)
-            for elem in choosen_pando:
+            choosen_pands = random.sample(pands, k=triples)
+            for elem in choosen_pands:
                 new_obj = {"s": elem['s'], "p": elem['p'], "o": choosen_object}
                 patterns.append(new_obj)
 
@@ -91,28 +91,25 @@ class DataHandler:
         self.total_time += needed_time
 
         endpoint_data = result.json()
-        print(endpoint_data)
         s = random.randint(0, 99)
         patterns = []
         loopcounter = 0
         choosen_subject = endpoint_data['results']['bindings'][s]['s']
-        choosen_subject_value = choosen_subject['value']
         while loopcounter < triples:
-            second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject_value + "> ?p ?o . ?o ?p1 ?o1 . FILTER(?o != ?o1)} LIMIT 100"
+            second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . ?o ?p1 ?o1 . FILTER(?o != ?o1)} LIMIT 100"
             second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
             second_data = second_result.json()
             pando = second_data['results']['bindings']
             lenght_of_pando = len(pando) - 1
             if lenght_of_pando <= 0:
-                # raise ValueError('Something went wrong. Cant read values')
                 break
             select_pando_pointer = random.randint(0, lenght_of_pando)
             if pando[select_pando_pointer]['o']['type'] == "uri":
-                new_obj = {"s": choosen_subject_value, "p": pando[select_pando_pointer]['p']['value'], "o": pando[select_pando_pointer]['o']['value']}
+                new_obj = {"s": choosen_subject, "p": pando[select_pando_pointer]['p'], "o": pando[select_pando_pointer]['o']}
                 patterns.append(new_obj)
-                choosen_subject_value = pando[select_pando_pointer]['o']['value']
+                choosen_subject = pando[select_pando_pointer]['o']
                 loopcounter = loopcounter + 1
-    
+
         return patterns
 
     def get_total_time(self):

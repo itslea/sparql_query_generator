@@ -57,7 +57,8 @@ def generate_query(queries, triples, operator_prob, var_prob):
 
     query = ''
     endpoint_data = dh.DataHandler().fetch_data_subject(triples)
-    if len(endpoint_data) > 0:
+    print(endpoint_data)
+    if len(endpoint_data) >= triples:
         patternandvar = create_triple_patterns(endpoint_data, var_prob)
         patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
         variables = patternandvar['variables']
@@ -65,8 +66,8 @@ def generate_query(queries, triples, operator_prob, var_prob):
         select = oh.create_select_distinct(operator_prob)
         choosen_variables = oh.choose_select_variables(variables)
         query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
+        return query
 
     else:
         print("STOP, ZU WENIG TRIPLE IN GRAPH")  # TODO: was passiert dann?
-
-    return query
+        return None
