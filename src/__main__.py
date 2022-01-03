@@ -4,6 +4,9 @@ import generators.star_object_generator as sog
 import generators.path_generator as pg
 from generators.data_handler import DataHandler
 import generators.timetaker as tt 
+import generators.graph_generator as gg
+
+x = gg.Graph_Generator(1.23, ["Name", "2", "Test"], 2.32, ["Name", "2", "Test"], 1.22, ["Name", "2", "Test"])
 
 queries = ssg.generate_query(10, 5, 0.5, 0.5)
 for elem in queries['queries']:
