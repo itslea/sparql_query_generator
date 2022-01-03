@@ -1,4 +1,5 @@
 import random
+from timeit import default_timer as timer
 import generators.data_handler as dh
 import generators.operator_handler as oh
 
@@ -55,18 +56,25 @@ def create_triple_patterns(endpoint_data, var_prob):
 def generate_query(queries, triples, operator_prob, var_prob):
     """Generates query."""
 
-    query = ''
-    endpoint_data = dh.DataHandler().fetch_data_subject(triples)
-    if len(endpoint_data) > 0:
-        patternandvar = create_triple_patterns(endpoint_data, var_prob)
-        patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
-        variables = patternandvar['variables']
-        where = oh.create_operators(triples, operator_prob, patterns)
-        select = oh.create_select_distinct(operator_prob)
-        choosen_variables = oh.choose_select_variables(variables)
-        query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
+    start_time = timer()
+    all_queries = []
+    try_counter = 0
+    limit_tries = 100
 
-    else:
-        print("STOP, ZU WENIG TRIPLE IN GRAPH")  # TODO: was passiert dann?
+    while len(all_queries) < queries:
+        if try_counter > limit_tries:
+            break
+        query = ''
+        endpoint_data = dh.DataHandler().fetch_data_subject(triples)
+        if len(endpoint_data) >= triples:
+            patternandvar = create_triple_patterns(endpoint_data, var_prob)
+            patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
+            variables = patternandvar['variables']
+            where = oh.create_operators(triples, operator_prob, patterns)
+            select = oh.create_select_distinct(operator_prob)
+            choosen_variables = oh.choose_select_variables(variables)
+            query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
+            all_queries.append(query)
 
-    return query
+    total_time = timer() - start_time
+    return {"queries": all_queries, "exectime": total_time}
