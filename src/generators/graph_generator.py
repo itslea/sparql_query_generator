@@ -2,7 +2,7 @@ from matplotlib import colors
 import matplotlib.pyplot as plt
 from numpy import array
 
-
+#Init params like double, arr, double, arr, double, arr
 
 class Graph_Generator:
     def __init__(self, sog_time, sog_info, ssg_time, ssg_info, pg_time, pg_info):
