@@ -3,6 +3,7 @@ import generators.star_subject_generator as ssg
 import generators.star_object_generator as sog
 import generators.path_generator as pg
 from generators.data_handler import DataHandler
+import generators.timetaker as tt 
 
 queries = ssg.generate_query(10, 5, 0.5, 0.5)
 for elem in queries['queries']:
@@ -18,6 +19,12 @@ queries3 = pg.generate_query(10, 5, 0.5, 0.5)
 for elem in queries3['queries']:
     print(elem + '\n')
 print("Execution time path: ", str(queries3['exectime']))
+
+
+'''Usecase of Time Taker'''
+t = tt.TimeTaker("ssg")
+t.stoptimer()
+
 
 #print(ssg.generate_query(1, 4, 0.1, 0.5))
 # print(sog.generate_query(1, 4, 0.9, 0.5))
