@@ -4,7 +4,7 @@ from numpy import array
 
 #Init params like double, arr, double, arr, double, arr
 
-class Graph_Generator:
+class Graph_Creator:
     def __init__(self, sog_time, sog_info, ssg_time, ssg_info, pg_time, pg_info):
         self.sog_time = sog_time
         self.sog_info = sog_info
