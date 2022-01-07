@@ -11,6 +11,8 @@ def create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, 
     """Creates the basic shape of the query while replacing constants with
     variables according to the variable probability"""
 
+    print(connection)
+
     subj_var_counter = 1
     pred_var_counter = 1
     obj_var_counter = 1
@@ -20,58 +22,64 @@ def create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, 
     con_var = "?o"
     con_is_var = random.random() <= var_prob
 
-    patterns_and_var = []
-    endpoint_patterns_first = []
-    for elem in endpoint_data_first['patterns']:
-        endpoint_patterns_first.append(elem)
-
-    endpoint_patterns_second = []
-    for elem in endpoint_data_second['patterns']:
-        endpoint_patterns_second.append(elem)
-
-    endpoint_patterns_connection = []
-    endpoint_patterns_connection.append(endpoint_patterns_first[len(endpoint_data_first['patterns']) - 1])
-    endpoint_patterns_connection.append(endpoint_patterns_second[0])
-
-    endpoint_patterns_first.pop(len(endpoint_data_first['patterns']) - 1)
-    endpoint_patterns_second.pop(0)
-
     if endpoint_data_first['shape'] == "star_subject":
-        patterns_and_var = ssg.create_triple_patterns(endpoint_patterns_first, var_prob, pred_var_counter, obj_var_counter)
+        patterns_and_var = create_triple_patterns_subject(endpoint_data_first['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
         pred_var_counter = patterns_and_var['pred_counter']
         obj_var_counter = patterns_and_var['obj_counter']
     elif endpoint_data_first['shape'] == "star_object":
-        patterns_and_var = sog.create_triple_patterns(endpoint_patterns_first, var_prob, subj_var_counter, pred_var_counter)
+        patterns_and_var = create_triple_patterns_object(endpoint_data_first['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, subj_var_counter)
         subj_var_counter = patterns_and_var['subj_counter']
         pred_var_counter = patterns_and_var['pred_counter']
     elif endpoint_data_first['shape'] == "path":
-        patterns_and_var = pg.create_triple_patterns(endpoint_patterns_first, var_prob, pred_var_counter, obj_var_counter)
+        patterns_and_var = create_triple_patterns_path(endpoint_data_first['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
         pred_var_counter = patterns_and_var['pred_counter']
         obj_var_counter = patterns_and_var['obj_counter']
 
     patterns += patterns_and_var['patterns']
     variables += patterns_and_var['variables']
 
-    for elem in endpoint_patterns_connection:
-        subject = elem['s']
+    patterns_and_var2 = []
+
+    if endpoint_data_second['shape'] == "star_subject":
+        patterns_and_var2 = create_triple_patterns_subject(endpoint_data_second['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
+    elif endpoint_data_second['shape'] == "star_object":
+        patterns_and_var2 = create_triple_patterns_object(endpoint_data_second['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, subj_var_counter)
+    elif endpoint_data_second['shape'] == "path":
+        patterns_and_var2 = create_triple_patterns_path(endpoint_data_second['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
+
+    patterns += patterns_and_var2['patterns']
+    variables += patterns_and_var2['variables']
+
+    print("CREATE_TRIPLE_PATTERNS:  ", patterns)
+    return {"patterns": patterns, "variables": variables}
+
+
+def create_triple_patterns_subject(endpoint_data, var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter):
+    """Creates the basic shape of the query while replacing constants with
+    variables according to the variable probability"""
+
+    patterns = []
+    variables = []
+
+    subject = endpoint_data[0]['s']
+    if subject == connection:
+        if con_is_var:
+            subject = con_var
+            variables.append(subject)
+        else:
+            if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                subject = '<' + subject['value'] + '>'
+    else:
+        if random.random() <= var_prob:
+            subject = '?s'
+            variables.append(subject)
+        else:
+            if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                subject = '<' + subject['value'] + '>'
+
+    for elem in endpoint_data:
         predicate = elem['p']
         objectt = elem['o']
-
-        if elem['s'] == connection:
-            if con_is_var:
-                subject = con_var
-                variables.append(subject)
-            else:
-                if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
-                    subject = '<' + subject['value'] + '>'
-        else:
-            if random.random() <= var_prob:
-                subject = '?s' + str(pred_var_counter)
-                variables.append(subject)
-                subj_var_counter += 1
-            else:
-                if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
-                    subject = '<' + subject['value'] + '>'
 
         if random.random() <= var_prob:
             predicate = '?p' + str(pred_var_counter)
@@ -96,18 +104,122 @@ def create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, 
 
         patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
 
-    if endpoint_data_second['shape'] == "star_subject":
-        patterns_and_var = ssg.create_triple_patterns(endpoint_patterns_second, var_prob, pred_var_counter, obj_var_counter)
-    elif endpoint_data_second['shape'] == "star_object":
-        patterns_and_var = sog.create_triple_patterns(endpoint_patterns_second, var_prob, subj_var_counter, pred_var_counter)
-    elif endpoint_data_second['shape'] == "path":
-        patterns_and_var = pg.create_triple_patterns(endpoint_patterns_second, var_prob, pred_var_counter, obj_var_counter)
+    return {"patterns": patterns, "variables": variables, "pred_counter": pred_var_counter, "obj_counter": obj_var_counter}
 
-    patterns += patterns_and_var['patterns']
-    variables += patterns_and_var['variables']
 
-    print("WAS ", patterns)
-    return {"patterns": patterns, "variables": variables}
+def create_triple_patterns_object(endpoint_data, var_prob, connection, con_is_var, con_var, pred_var_counter, subj_var_counter):
+    """Creates the basic shape of the query while replacing constants with
+    variables according to the variable probability"""
+
+    patterns = []
+    variables = []
+
+    objectt = endpoint_data[0]['o']
+    if object == connection:
+        if con_is_var:
+            objectt = con_var
+            variables.append(objectt)
+        else:
+            objectt = dh.DataHandler().get_object_string(objectt)
+    else:
+        if random.random() <= var_prob:
+            objectt = '?o'
+            variables.append(objectt)
+        else:
+            objectt = dh.DataHandler().get_object_string(objectt)
+
+    for elem in endpoint_data:
+        subject = elem['s']
+        predicate = elem['p']
+
+        if random.random() <= var_prob:
+            predicate = '?p' + str(pred_var_counter)
+            variables.append(predicate)
+            pred_var_counter += 1
+        else:
+            predicate = '<' + predicate['value'] + '>'
+
+        if elem['s'] == connection:
+            if con_is_var:
+                subject = con_var
+                variables.append(subject)
+            else:
+                if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                    subject = '<' + subject['value'] + '>'
+        else:
+            if random.random() <= var_prob:
+                subject = '?s' + str(subj_var_counter)
+                variables.append(subject)
+                subj_var_counter += 1
+            else:
+                if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                    subject = '<' + subject['value'] + '>'
+
+        patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
+
+    return {"patterns": patterns, "variables": variables, "subj_counter": subj_var_counter, "pred_counter": pred_var_counter}
+
+
+def create_triple_patterns_path(endpoint_data, var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter):
+    """Creates the basic shape of the query while replacing constants with
+    variables according to the variable probability"""
+
+    patterns = []
+    variables = []
+
+    is_first = endpoint_data[0]
+    temp_var = "?o"
+    path_is_var = random.random() <= var_prob
+
+    for elem in endpoint_data:
+        subject = elem['s']
+        predicate = elem['p']
+        objectt = elem['o']
+
+        if path_is_var and is_first == elem:
+            if elem['s'] == connection:
+                if con_is_var:
+                    subject = con_var
+                    variables.append(subject)
+                else:
+                    if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                        subject = '<' + subject['value'] + '>'
+            else:
+                subject = '?s'
+                variables.append(subject)
+        elif path_is_var:
+            subject = temp_var
+        else:
+            if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                subject = '<' + subject['value'] + '>'
+
+        if random.random() <= var_prob:
+            predicate = '?p' + str(pred_var_counter)
+            variables.append(predicate)
+            pred_var_counter += 1
+        else:
+            predicate = '<' + predicate['value'] + '>'
+
+        path_is_var = random.random() <= var_prob
+
+        if path_is_var:
+            objectt = '?o' + str(obj_var_counter)
+            variables.append(objectt)
+            temp_var = '?o' + str(obj_var_counter)
+            obj_var_counter += 1
+        else:
+            if elem['o'] == connection:
+                if con_is_var:
+                    objectt = con_var
+                    variables.append(objectt)
+                else:
+                    objectt = dh.DataHandler().get_object_string(objectt)
+            else:
+                objectt = dh.DataHandler().get_object_string(objectt)
+
+        patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
+
+    return {"patterns": patterns, "variables": variables, "pred_counter": pred_var_counter, "obj_counter": obj_var_counter}
 
 
 def generate_query(queries, triples, operator_prob, var_prob):

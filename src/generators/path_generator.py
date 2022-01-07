@@ -4,9 +4,12 @@ import helpers.data_handler as dh
 import helpers.operator_handler as oh
 
 
-def create_triple_patterns(endpoint_data, var_prob, pred_var_counter, obj_var_counter):
+def create_triple_patterns(endpoint_data, var_prob):
     """Creates the basic shape of the query while replacing constants with
     variables according to the variable probability"""
+
+    pred_var_counter = 1
+    obj_var_counter = 1
 
     patterns = []
     variables = []
@@ -48,7 +51,7 @@ def create_triple_patterns(endpoint_data, var_prob, pred_var_counter, obj_var_co
 
         patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
 
-    return {"patterns": patterns, "variables": variables, "pred_counter": pred_var_counter, "obj_counter": obj_var_counter}
+    return {"patterns": patterns, "variables": variables}
 
 
 def generate_query(queries, triples, operator_prob, var_prob):
@@ -65,7 +68,7 @@ def generate_query(queries, triples, operator_prob, var_prob):
         endpoint_data = dh.DataHandler().fetch_data_path(triples)
         try_counter += 1
         if len(endpoint_data) >= triples:
-            patternandvar = create_triple_patterns(endpoint_data, var_prob, 1, 1)
+            patternandvar = create_triple_patterns(endpoint_data, var_prob)
             patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
             variables = patternandvar['variables']
             where = oh.create_operators(triples, operator_prob, patterns)
