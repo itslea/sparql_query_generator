@@ -10,11 +10,13 @@ import helpers.graph_creator as gg
 # x = gg.Graph_Creator(1.23, ["Name", "2", "Test"], 2.32, ["Name", "2", "Test"], 1.22, ["Name", "2", "Test"])
 
 
-queries3 = mg.generate_query(1, 5, 0.5, 0)
+queries4 = mg.generate_query(1, 5, 0.5, 0.5)
+for elem in queries4['queries']:
+    print(elem + '\n')
+print("Execution time mixed: ", str(queries4['exectime']))
 
 
-
-#print(ssg.generate_query(1, 4, 0.1, 0.5))
+# print(ssg.generate_query(1, 4, 0.1, 0.5))
 # print(sog.generate_query(1, 4, 0.9, 0.5))
 
 #  x = DataHandler()

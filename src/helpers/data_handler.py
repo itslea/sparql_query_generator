@@ -2,6 +2,7 @@ import random
 import time
 import requests
 
+
 class DataHandler:
     """Handles HTTP requests sent to SPARQL endpoint"""
     def __init__(self):
@@ -57,13 +58,11 @@ class DataHandler:
         return patterns
 
     def fetch_path(self, triples, choosen_subject):
-        print(choosen_subject)
         patterns = []
         loopcounter = 0
         while loopcounter < triples:
             second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . ?o ?p1 ?o1 . FILTER(?o != ?o1)} LIMIT " + str(self.limit)
             second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
-            print(str(loopcounter), second_result)
             if second_result.status_code != 200:
                 break
             second_data = second_result.json()
@@ -152,7 +151,7 @@ class DataHandler:
         second_shape = random.choice(choose_shape)
         first_triples = random.randint(2, triples - 2)
         second_triples = triples - first_triples
-        print(first_triples, second_triples)
+        # print(first_triples, second_triples)
 
         first_patterns = []
         second_patterns = []
@@ -166,21 +165,22 @@ class DataHandler:
         elif first_shape == "path":
             first_patterns = self.fetch_data_path(first_triples)
 
-        print("First-Patterns: ", first_patterns)
+        # print("First-Patterns: ", first_patterns)
 
+        choosen_object = ""
         if first_patterns is not None and len(first_patterns) >= 2:
             choosen_object = random.choice(first_patterns)['o']
-            print("Choosen object: ", choosen_object)
+            # print("Choosen object: ", choosen_object)
             if second_shape == "star_subject":
                 second_patterns = self.fetch_subject(second_triples, choosen_object, False)
             elif second_shape == "star_object":
                 second_patterns = self.fetch_object(second_triples, choosen_object)
             elif second_shape == "path":
                 second_patterns = self.fetch_path(second_triples, choosen_object)
-            print("Second-Patterns: ", second_patterns)
+            # print("Second-Patterns: ", second_patterns)
 
         print(first_shape, second_shape)
-        return first_patterns + second_patterns
+        return {"first": {"shape": first_shape, "patterns": first_patterns}, "second": {"shape": second_shape, "patterns": second_patterns}, "connection": choosen_object}
 
     def get_total_time(self):
         """Gets total time"""
