@@ -2,7 +2,6 @@ import random
 import time
 import requests
 
-
 class DataHandler:
     """Handles HTTP requests sent to SPARQL endpoint"""
     def __init__(self):

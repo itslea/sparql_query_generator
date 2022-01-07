@@ -1,7 +1,7 @@
 import random
 from timeit import default_timer as timer
-import generators.data_handler as dh
-import generators.operator_handler as oh
+import helpers.data_handler as dh
+import helpers.operator_handler as oh
 
 
 def create_triple_patterns(endpoint_data, var_prob):
