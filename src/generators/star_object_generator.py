@@ -18,16 +18,7 @@ def create_triple_patterns(endpoint_data, var_prob):
         objectt = '?o'
         variables.append(objectt)
     else:
-        if objectt['type'] == 'uri':
-            objectt = '<' + objectt['value'] + '>'
-        elif objectt['type'] == 'literal':
-            objectt = '\"' + objectt['value'] + '\"' + "@" + objectt['xml:lang']
-        elif objectt['type'] == 'typed-literal':
-            if objectt['datatype'] == 'http://www.w3.org/2001/XMLSchema#integer':
-                objectt = str(objectt['value'])
-            else:
-                objectt = '\"' + objectt['value'] + '\"' + "^^<" + objectt['datatype'] + ">"
-        # TODO: elif blank node
+        objectt = dh.DataHandler().get_object_string(objectt)
 
     for elem in endpoint_data:
         subject = elem['s']

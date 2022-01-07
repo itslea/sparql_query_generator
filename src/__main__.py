@@ -2,17 +2,15 @@
 import generators.star_subject_generator as ssg
 import generators.star_object_generator as sog
 import generators.path_generator as pg
+import generators.mixed_generator as mg
 from helpers.data_handler import DataHandler
 import helpers.timetaker as tt 
 import helpers.graph_creator as gg
 
 # x = gg.Graph_Creator(1.23, ["Name", "2", "Test"], 2.32, ["Name", "2", "Test"], 1.22, ["Name", "2", "Test"])
 
-queries = ssg.generate_query(10, 5, 0.5, 0.5)
-for elem in queries['queries']:
-    print(elem + '\n')
-print("Execution time subject: ", str(queries['exectime']))
 
+queries3 = mg.generate_query(1, 5, 0.5, 0)
 
 
 

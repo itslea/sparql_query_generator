@@ -4,15 +4,17 @@ import random
 def choose_select_variables(variables):
     """Chooses random variables for SELECT (DISTINCT)"""
 
+    print(variables)
     choosen_variables = ""
     all_or_variables = ["all", "variables"]
-    choose_all = random.choice(all_or_variables)
-    if len(variables) == 1:
-        choose_all = all_or_variables[0]
-    if choose_all[0] == "all":
+    choose_all = str(random.choice(all_or_variables))
+    if len(variables) <= 0:
+        choose_all = "all"
+    if choose_all == "all":
         choosen_variables = "*"
+        print("HALLO")
     else:
-        random_variables = random.sample(variables, k=random.randint(1, len(variables) - 1))
+        random_variables = random.sample(variables, k=random.randint(1, len(variables)))
         for elem in random_variables:
             if not random_variables.index(elem) == len(random_variables) - 1:
                 choosen_variables += elem + ", "
