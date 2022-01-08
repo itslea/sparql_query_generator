@@ -6,13 +6,18 @@ from helpers.data_handler import DataHandler
 import helpers.timetaker as tt
 import helpers.graph_creator as gg
 
-# x = gg.Graph_Creator(1.23, ["Name", "2", "Test"], 2.32, ["Name", "2", "Test"], 1.22, ["Name", "2", "Test"])
+#x = gg.Graph_Creator(1.23, ["Name", "2", "Test"], 2.32, ["Name", "2", "Test"], 1.22, ["Name", "2", "Test"])
 
 
-queries4 = mg.generate_query(1, 4, 0.5, 0.5)
+queries4 = mg.generate_query(1, 5, 0.5, 0.5)
 for elem in queries4['queries']:
-    print(elem + '\n')
+   print(elem + '\n')
 print("Execution time mixed: ", str(queries4['exectime']))
+
+# queries = pg.generate_query(1, 6, 0.5, 0.5)
+# for elem in queries['queries']:
+#    print(elem + '\n')
+# print("Execution time path: ", str(queries['exectime']))
 
 
 # print(ssg.generate_query(1, 4, 0.1, 0.5))
@@ -27,3 +32,5 @@ print("Execution time mixed: ", str(queries4['exectime']))
 # x = DataHandler()
 # print(x.fetch_data_subject(3))
 # print(x.fetch_data_path(3))
+
+

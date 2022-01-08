@@ -12,6 +12,7 @@ class TimeTaker:
         self.logger.addHandler(handler)
         self.logger.level = logging.INFO
         self.message = str(message)
+        self.starttime = 0
 
     def start_timer(self):
         self.starttime = time.time()

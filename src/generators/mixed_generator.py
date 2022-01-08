@@ -221,7 +221,7 @@ def create_triple_patterns_path(endpoint_data, var_prob, connection, con_is_var,
 def generate_query(queries, triples, operator_prob, var_prob):
     """Generates query."""
     timelogger = tt.TimeTaker("Mixed Generator")
-    timelogger.starttimer()
+    timelogger.start_timer()
     # start_time = timer()
     all_queries = []
     try_counter = 0
@@ -238,6 +238,7 @@ def generate_query(queries, triples, operator_prob, var_prob):
         # print(endpoint_data)
         if len(endpoint_data) >= triples:
             print("ENDPOINT DATA: ", endpoint_data)
+            timelogger.message_log(endpoint_data)
             connection = endpoint_data_result['connection']
             patternandvar = create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, connection)
             patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
@@ -247,6 +248,6 @@ def generate_query(queries, triples, operator_prob, var_prob):
             choosen_variables = oh.OperatorHandler().choose_select_variables(variables)
             query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
             all_queries.append(query)
-    total_time = timelogger.stoptimer()
+    total_time = timelogger.stop_timer()
     # total_time = timer() - start_time
     return {"queries": all_queries, "exectime": total_time}

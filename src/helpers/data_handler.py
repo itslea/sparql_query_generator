@@ -6,7 +6,7 @@ import requests
 class DataHandler:
     """Handles HTTP requests sent to SPARQL endpoint"""
     def __init__(self):
-        self.adress = 'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
+        self.adress =  'https://dbpedia.org/sparql' #  'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
         self.default_graph_uri = 'default-graph-uri='
         self.timeout = str(0)
         self.total_time = 0
@@ -72,7 +72,7 @@ class DataHandler:
         patterns = []
         loopcounter = 0
         while loopcounter < triples:
-            second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . ?o ?p1 ?o1 . FILTER(?o != ?o1)} LIMIT " + str(self.limit)
+            second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o .} LIMIT " + str(self.limit)
             second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
             if second_result.status_code != 200:
                 break
@@ -120,6 +120,7 @@ class DataHandler:
         query = "SELECT DISTINCT * FROM <http://dbpedia.org> WHERE {?s1 ?p1 ?o. ?s2 ?p2 ?o. FILTER(?p1 != rdf:type && ?p2 != rdf:type) FILTER(?s1 != ?s2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s1, ?p1, ?o))} LIMIT " + str(self.limit)
         start_time = time.time()
         result = requests.get(self.adress, params={'format': 'json', 'query': query})
+        print(result)
         end_time = time.time()
         needed_time = end_time - start_time
         self.total_time += needed_time
@@ -161,7 +162,7 @@ class DataHandler:
         first_shape = "star_object"
         choose_shape.remove(str(first_shape))
         second_shape = random.choice(choose_shape)
-        second_shape = "star_subject"
+        second_shape = "path"
         first_triples = random.randint(2, triples - 2)
         second_triples = triples - first_triples
         # print(first_triples, second_triples)
@@ -183,6 +184,8 @@ class DataHandler:
             choosen_object = first_patterns[len(first_patterns) - 1]['o']
 
         # print("First-Patterns: ", first_patterns)
+
+        print(choosen_object)
 
         if first_patterns is not None and len(first_patterns) >= 2:
             # print("Choosen object: ", choosen_object)
