@@ -49,13 +49,9 @@ def create_triple_patterns(endpoint_data, var_prob):
 
 def generate_query(queries, triples, operator_prob, var_prob):
     """Generates query."""
-    timelogger = tt.TimeTaker("Star Object Generator")
-    timelogger.start_timer()
-
-    # start_time = timer()
     all_queries = []
     try_counter = 0
-    limit_tries = 20
+    limit_tries = 100
     while len(all_queries) < queries:
         if try_counter > limit_tries:
             break
@@ -63,7 +59,6 @@ def generate_query(queries, triples, operator_prob, var_prob):
         query = ''
         endpoint_data = dh.DataHandler().fetch_data_object(triples, False)
         if len(endpoint_data) >= triples:
-            timelogger.message_log(endpoint_data)
             patternandvar = create_triple_patterns(endpoint_data, var_prob)
             patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
             variables = patternandvar['variables']
@@ -72,7 +67,4 @@ def generate_query(queries, triples, operator_prob, var_prob):
             choosen_variables = oh.OperatorHandler().choose_select_variables(variables)
             query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
             all_queries.append(query)
-
-    total_time = timelogger.stop_timer()
-    # total_time = timer() - start_time
-    return {"queries": all_queries, "exectime": total_time}
+    return all_queries

@@ -57,10 +57,6 @@ def create_triple_patterns(endpoint_data, var_prob):
 
 def generate_query(queries, triples, operator_prob, var_prob):
     """Generates query."""
-    timelogger = tt.TimeTaker("Generates querys")
-    timelogger.start_timer()
-
-    # start_time = timer()
     all_queries = []
     try_counter = 0
     limit_tries = 100
@@ -80,6 +76,4 @@ def generate_query(queries, triples, operator_prob, var_prob):
             choosen_variables = oh.OperatorHandler().choose_select_variables(variables)
             query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
             all_queries.append(query)
-    total_time = timelogger.stop_timer()
-    # total_time = timer() - start_time
-    return {"queries": all_queries, "exectime": total_time}
+    return all_queries

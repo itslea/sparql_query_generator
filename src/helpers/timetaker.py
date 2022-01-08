@@ -24,4 +24,4 @@ class TimeTaker:
         return needed_time
 
     def message_log(self, message):
-        self.logger.info("ENDPOINT DATA: " + str(message))
+        self.logger.info("QUERY: " + str(message))

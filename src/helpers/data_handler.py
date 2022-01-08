@@ -120,7 +120,6 @@ class DataHandler:
         query = "SELECT DISTINCT * FROM <http://dbpedia.org> WHERE {?s1 ?p1 ?o. ?s2 ?p2 ?o. FILTER(?p1 != rdf:type && ?p2 != rdf:type) FILTER(?s1 != ?s2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s1, ?p1, ?o))} LIMIT " + str(self.limit)
         start_time = time.time()
         result = requests.get(self.adress, params={'format': 'json', 'query': query})
-        print(result)
         end_time = time.time()
         needed_time = end_time - start_time
         self.total_time += needed_time
@@ -175,19 +174,22 @@ class DataHandler:
                 first_patterns = self.fetch_data_subject(first_triples, False)
             elif second_shape == "path":
                 first_patterns = self.fetch_data_subject(first_triples, True)
-            choosen_object = random.choice(first_patterns)['o']
+            if len(first_patterns) >= 2:
+                choosen_object = random.choice(first_patterns)['o']
         elif first_shape == "star_object":
             first_patterns = self.fetch_data_object(first_triples)
-            choosen_object = random.choice(first_patterns)['o']
+            if len(first_patterns) >= 2:
+                choosen_object = random.choice(first_patterns)['o']
         elif first_shape == "path":
             first_patterns = self.fetch_data_path(first_triples)
-            choosen_object = first_patterns[len(first_patterns) - 1]['o']
+            if len(first_patterns) >= 2:
+                choosen_object = first_patterns[len(first_patterns) - 1]['o']
 
         # print("First-Patterns: ", first_patterns)
 
-        print(choosen_object)
+        #print(choosen_object)
 
-        if first_patterns is not None and len(first_patterns) >= 2:
+        if len(first_patterns) >= 2:
             # print("Choosen object: ", choosen_object)
             if second_shape == "star_subject":
                 second_patterns = self.fetch_subject(second_triples, choosen_object, False)
@@ -197,7 +199,7 @@ class DataHandler:
                 second_patterns = self.fetch_path(second_triples, choosen_object)
             # print("Second-Patterns: ", second_patterns)
 
-        print(first_shape, second_shape)
+        #print(first_shape, second_shape)
         return {"first": {"shape": first_shape, "patterns": first_patterns}, "second": {"shape": second_shape, "patterns": second_patterns}, "connection": choosen_object}
 
     # def get_total_time(self):
