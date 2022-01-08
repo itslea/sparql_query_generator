@@ -29,7 +29,7 @@ def create_triple_patterns(endpoint_data, var_prob):
         elif path_is_var:
             subject = temp_var
         else:
-            if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+            if subject['type'] == 'uri':
                 subject = '<' + subject['value'] + '>'
 
         if random.random() <= var_prob:

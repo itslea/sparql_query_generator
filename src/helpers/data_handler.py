@@ -150,7 +150,7 @@ class DataHandler:
 
         return self.fetch_path(triples, choosen_subject)
 
-    def fetch_data_mixed(self, triples):  # TODO: muss mind. 4 triple patterns pro query sein
+    def fetch_data_mixed(self, triples):  # has to be at leat 4 triples otherwise it won't work
         """Fetches data from SPARQL endpoint for star-subject-generator"""
 
         if triples > 100:

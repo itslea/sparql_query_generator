@@ -21,7 +21,6 @@ def create_triple_patterns(endpoint_data, var_prob):
     else:
         if subject['type'] == 'uri':
             subject = '<' + subject['value'] + '>'
-        # TODO: elif(subject['type' == ]) blank node
 
     for elem in endpoint_data:
         predicate = elem['p']

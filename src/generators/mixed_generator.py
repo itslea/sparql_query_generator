@@ -1,8 +1,5 @@
 import random
 from timeit import default_timer as timer
-import generators.star_subject_generator as ssg
-import generators.star_object_generator as sog
-import generators.path_generator as pg
 import helpers.data_handler as dh
 import helpers.operator_handler as oh
 
@@ -10,8 +7,6 @@ import helpers.operator_handler as oh
 def create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, connection):
     """Creates the basic shape of the query while replacing constants with
     variables according to the variable probability"""
-
-    print(connection)
 
     subj_var_counter = 1
     pred_var_counter = 1
@@ -68,14 +63,14 @@ def create_triple_patterns_subject(endpoint_data, var_prob, connection, con_is_v
             subject = con_var
             variables.append(subject)
         else:
-            if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+            if subject['type'] == 'uri':
                 subject = '<' + subject['value'] + '>'
     else:
         if random.random() <= var_prob:
             subject = '?s'
             variables.append(subject)
         else:
-            if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+            if subject['type'] == 'uri':
                 subject = '<' + subject['value'] + '>'
 
     for elem in endpoint_data:
@@ -145,7 +140,7 @@ def create_triple_patterns_object(endpoint_data, var_prob, connection, con_is_va
                 subject = con_var
                 variables.append(subject)
             else:
-                if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                if subject['type'] == 'uri':
                     subject = '<' + subject['value'] + '>'
         else:
             if random.random() <= var_prob:
@@ -153,7 +148,7 @@ def create_triple_patterns_object(endpoint_data, var_prob, connection, con_is_va
                 variables.append(subject)
                 subj_var_counter += 1
             else:
-                if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                if subject['type'] == 'uri':
                     subject = '<' + subject['value'] + '>'
 
         patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
@@ -183,7 +178,7 @@ def create_triple_patterns_path(endpoint_data, var_prob, connection, con_is_var,
                     subject = con_var
                     variables.append(subject)
                 else:
-                    if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+                    if subject['type'] == 'uri':
                         subject = '<' + subject['value'] + '>'
             else:
                 subject = '?s'
@@ -191,7 +186,7 @@ def create_triple_patterns_path(endpoint_data, var_prob, connection, con_is_var,
         elif path_is_var:
             subject = temp_var
         else:
-            if subject['type'] == 'uri':  # TODO: elif(subject['type' == ]) blank node
+            if subject['type'] == 'uri':
                 subject = '<' + subject['value'] + '>'
 
         if random.random() <= var_prob:
