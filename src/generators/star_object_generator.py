@@ -1,7 +1,9 @@
 import random
+import time
 from timeit import default_timer as timer
 import helpers.data_handler as dh
 import helpers.operator_handler as oh
+import helpers.timetaker as tt
 
 
 def create_triple_patterns(endpoint_data, var_prob):
@@ -47,8 +49,10 @@ def create_triple_patterns(endpoint_data, var_prob):
 
 def generate_query(queries, triples, operator_prob, var_prob):
     """Generates query."""
+    timelogger = tt.TimeTaker("Star Object Generator")
+    timelogger.starttimer()
 
-    start_time = timer()
+    # start_time = timer()
     all_queries = []
     try_counter = 0
     limit_tries = 20
@@ -68,5 +72,6 @@ def generate_query(queries, triples, operator_prob, var_prob):
             query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
             all_queries.append(query)
 
-    total_time = timer() - start_time
+    total_time = timelogger.stoptimer()
+    # total_time = timer() - start_time
     return {"queries": all_queries, "exectime": total_time}

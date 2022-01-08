@@ -34,6 +34,7 @@ class Graph_Creator:
         plt.title("Required time of the generators")
         plt.xlabel("Generators")
         plt.ylabel("Time")
-        plt.bar(["Star-Subject","Star-Object","Path-Generator"], self.time_collection, color=('red', 'green', 'blue'))
+        plt.bar(["Star-Subject\n" + str(self.time_collection[0]) + "s","Star-Object\n"+ str(self.time_collection[1]) + "s","Path-Generator\n" + str(self.time_collection[1]) + "s"], self.time_collection, color=('red', 'green', 'blue'), width=0.2) 
+
         plt.show()
 
