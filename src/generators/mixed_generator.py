@@ -50,7 +50,7 @@ def create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, 
     patterns += patterns_and_var2['patterns']
     variables += patterns_and_var2['variables']
 
-    print("CREATE_TRIPLE_PATTERNS:  ", patterns)
+    # print("CREATE_TRIPLE_PATTERNS:  ", patterns)
     return {"patterns": patterns, "variables": variables}
 
 
@@ -228,16 +228,17 @@ def generate_query(queries, triples, operator_prob, var_prob):
     start_time = timer()
     all_queries = []
     try_counter = 0
-    limit_tries = 100
+    limit_tries = 20
     while len(all_queries) < queries:
         if try_counter > limit_tries:
             break
+        try_counter += 1
         query = ''
         endpoint_data_result = dh.DataHandler().fetch_data_mixed(triples)
         endpoint_data_first = endpoint_data_result['first']
         endpoint_data_second = endpoint_data_result['second']
         endpoint_data = endpoint_data_first['patterns'] + endpoint_data_second['patterns']
-        print(endpoint_data)
+        # print(endpoint_data)
         if len(endpoint_data) >= triples:
             connection = endpoint_data_result['connection']
             patternandvar = create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, connection)

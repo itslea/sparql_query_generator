@@ -64,9 +64,9 @@ def generate_query(queries, triples, operator_prob, var_prob):
     while len(all_queries) < queries:
         if try_counter > limit_tries:
             break
+        try_counter += 1
         query = ''
         endpoint_data = dh.DataHandler().fetch_data_path(triples)
-        try_counter += 1
         if len(endpoint_data) >= triples:
             patternandvar = create_triple_patterns(endpoint_data, var_prob)
             patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n

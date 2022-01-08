@@ -99,14 +99,14 @@ class DataHandler:
 
         return self.fetch_subject(triples, choosen_subject, obj_is_uri)
 
-    def fetch_data_object(self, triples):
+    def fetch_data_object(self, triples, obj_is_uri):
         """Fetches data from SPARQL endpoint for star-object-generator"""
 
         if triples > 100:
             self.limit = triples
 
         #  Gets object that fulfills minimum shape criteria
-        query = "SELECT DISTINCT * FROM <http://dbpedia.org> WHERE {?s1 ?p1 ?o. ?s2 ?p2 ?o. FILTER(?p1 != rdf:type && ?p2 != rdf:type) FILTER(?s1 != ?s2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s1, ?p1, ?o))} LIMIT " + str(self.limit)
+        query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o1. ?s ?p2 ?o2. FILTER(?o1 != ?o2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o1))} LIMIT " + str(self.limit)
         start_time = time.time()
         result = requests.get(self.adress, params={'format': 'json', 'query': query})
         end_time = time.time()
@@ -114,9 +114,19 @@ class DataHandler:
         self.total_time += needed_time
 
         endpoint_data = result.json()
+        endpoint_data = endpoint_data['results']['bindings']
         o = random.randint(0, self.limit - 1)
-        choosen_object = endpoint_data['results']['bindings'][o]['o']
+        choosen_object = endpoint_data[o]['o']
+        object_uri_list = []
+        if obj_is_uri:
+            for elem in endpoint_data:
+                if elem['o']['type'] == "uri":
+                    object_uri_list.append(elem['o'])
+                    break
+            ro = random.randint(0, len(object_uri_list) - 1)
+            choosen_object = object_uri_list[ro]
 
+        print(choosen_object)
         return self.fetch_object(triples, choosen_object)
 
     def fetch_data_path(self, triples):
@@ -161,7 +171,7 @@ class DataHandler:
             elif second_shape == "path":
                 first_patterns = self.fetch_data_subject(first_triples, True)
         elif first_shape == "star_object":
-            first_patterns = self.fetch_data_object(first_triples)
+            first_patterns = self.fetch_data_object(first_triples, True)
         elif first_shape == "path":
             first_patterns = self.fetch_data_path(first_triples)
 

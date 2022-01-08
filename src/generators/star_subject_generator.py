@@ -53,10 +53,10 @@ def generate_query(queries, triples, operator_prob, var_prob):
     all_queries = []
     try_counter = 0
     limit_tries = 100
-
     while len(all_queries) < queries:
         if try_counter > limit_tries:
             break
+        try_counter += 1
         query = ''
         endpoint_data = dh.DataHandler().fetch_data_subject(triples)
         if len(endpoint_data) >= triples:
