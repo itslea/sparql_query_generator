@@ -19,8 +19,9 @@ def create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, 
     patterns = []
     variables = []
 
-    con_var = "?o"
+    con_var = "?connect"
     con_is_var = random.random() <= var_prob
+    print("Con is var: ", con_is_var)
 
     if endpoint_data_first['shape'] == "star_subject":
         patterns_and_var = create_triple_patterns_subject(endpoint_data_first['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
@@ -115,7 +116,7 @@ def create_triple_patterns_object(endpoint_data, var_prob, connection, con_is_va
     variables = []
 
     objectt = endpoint_data[0]['o']
-    if object == connection:
+    if objectt == connection:
         if con_is_var:
             objectt = con_var
             variables.append(objectt)
@@ -202,20 +203,19 @@ def create_triple_patterns_path(endpoint_data, var_prob, connection, con_is_var,
 
         path_is_var = random.random() <= var_prob
 
-        if path_is_var:
+        if elem['o'] == connection:
+            if con_is_var:
+                objectt = con_var
+                variables.append(objectt)
+            else:
+                objectt = dh.DataHandler().get_object_string(objectt)
+        elif path_is_var:
             objectt = '?o' + str(obj_var_counter)
             variables.append(objectt)
             temp_var = '?o' + str(obj_var_counter)
             obj_var_counter += 1
         else:
-            if elem['o'] == connection:
-                if con_is_var:
-                    objectt = con_var
-                    variables.append(objectt)
-                else:
-                    objectt = dh.DataHandler().get_object_string(objectt)
-            else:
-                objectt = dh.DataHandler().get_object_string(objectt)
+            objectt = dh.DataHandler().get_object_string(objectt)
 
         patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
 
@@ -240,6 +240,7 @@ def generate_query(queries, triples, operator_prob, var_prob):
         endpoint_data = endpoint_data_first['patterns'] + endpoint_data_second['patterns']
         # print(endpoint_data)
         if len(endpoint_data) >= triples:
+            print("ENDPOINT DATA: ", endpoint_data)
             connection = endpoint_data_result['connection']
             patternandvar = create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, connection)
             patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n

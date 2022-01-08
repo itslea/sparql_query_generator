@@ -13,11 +13,16 @@ class DataHandler:
         self.limit = 100
 
     def get_object_string(self, choosen_object):
+        """Returns corresponding string representation of an object"""
+
         object_type = ""
         if choosen_object['type'] == 'uri':
             object_type = '<' + choosen_object['value'] + '>'
         elif choosen_object['type'] == 'literal':
-            object_type = '\"' + choosen_object['value'] + '\"' + "@" + choosen_object['xml:lang']
+            if choosen_object['xml:lang'] is not None:
+                object_type = '\"' + choosen_object['value'] + '\"' + "@" + choosen_object['xml:lang']
+            else:
+                object_type = '\"' + choosen_object['value']
         elif choosen_object['type'] == 'typed-literal':
             if choosen_object['datatype'] == 'http://www.w3.org/2001/XMLSchema#integer':
                 object_type = str(choosen_object['value'])
@@ -27,6 +32,8 @@ class DataHandler:
         return object_type
 
     def fetch_subject(self, triples, choosen_subject, object_is_uri):  # subject = entire json object (incl. type and value)
+        """Fetches predicates and objects to given subject from the endpoint"""
+
         second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . }"
         second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
         second_data = second_result.json()
@@ -43,6 +50,8 @@ class DataHandler:
         return patterns
 
     def fetch_object(self, triples, choosen_object):
+        """Fetches subjects and predicates to given object from endpoint"""
+
         object_type = self.get_object_string(choosen_object)
         second_query = "SELECT DISTINCT ?s, ?p FROM <http://dbpedia.org> WHERE {?s ?p " + object_type + " .} LIMIT " + str(self.limit)
         second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
@@ -58,6 +67,8 @@ class DataHandler:
         return patterns
 
     def fetch_path(self, triples, choosen_subject):
+        """Fetches path structure to given start-subject from endpoint"""
+
         patterns = []
         loopcounter = 0
         while loopcounter < triples:
@@ -99,7 +110,7 @@ class DataHandler:
 
         return self.fetch_subject(triples, choosen_subject, obj_is_uri)
 
-    def fetch_data_object(self, triples, obj_is_uri):
+    def fetch_data_object(self, triples):
         """Fetches data from SPARQL endpoint for star-object-generator"""
 
         if triples > 100:
@@ -114,19 +125,9 @@ class DataHandler:
         self.total_time += needed_time
 
         endpoint_data = result.json()
-        endpoint_data = endpoint_data['results']['bindings']
         o = random.randint(0, self.limit - 1)
-        choosen_object = endpoint_data[o]['o']
-        object_uri_list = []
-        if obj_is_uri:
-            for elem in endpoint_data:
-                if elem['o']['type'] == "uri":
-                    object_uri_list.append(elem['o'])
-                    break
-            ro = random.randint(0, len(object_uri_list) - 1)
-            choosen_object = object_uri_list[ro]
+        choosen_object = endpoint_data['results']['bindings'][o]['o']
 
-        print(choosen_object)
         return self.fetch_object(triples, choosen_object)
 
     def fetch_data_path(self, triples):
@@ -157,29 +158,33 @@ class DataHandler:
 
         choose_shape = ["star_subject", "star_object", "path"]
         first_shape = random.choice(choose_shape)
+        first_shape = "star_object"
         choose_shape.remove(str(first_shape))
         second_shape = random.choice(choose_shape)
+        second_shape = "star_subject"
         first_triples = random.randint(2, triples - 2)
         second_triples = triples - first_triples
         # print(first_triples, second_triples)
 
         first_patterns = []
         second_patterns = []
+        choosen_object = ""
         if first_shape == "star_subject":
             if second_shape == "star_object":  # bei path muss object uri sein
                 first_patterns = self.fetch_data_subject(first_triples, False)
             elif second_shape == "path":
                 first_patterns = self.fetch_data_subject(first_triples, True)
+            choosen_object = random.choice(first_patterns)['o']
         elif first_shape == "star_object":
-            first_patterns = self.fetch_data_object(first_triples, True)
+            first_patterns = self.fetch_data_object(first_triples)
+            choosen_object = random.choice(first_patterns)['o']
         elif first_shape == "path":
             first_patterns = self.fetch_data_path(first_triples)
+            choosen_object = first_patterns[len(first_patterns) - 1]['o']
 
         # print("First-Patterns: ", first_patterns)
 
-        choosen_object = ""
         if first_patterns is not None and len(first_patterns) >= 2:
-            choosen_object = random.choice(first_patterns)['o']
             # print("Choosen object: ", choosen_object)
             if second_shape == "star_subject":
                 second_patterns = self.fetch_subject(second_triples, choosen_object, False)
