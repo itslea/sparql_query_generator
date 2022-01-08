@@ -71,9 +71,9 @@ def generate_query(queries, triples, operator_prob, var_prob):
             patternandvar = create_triple_patterns(endpoint_data, var_prob)
             patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
             variables = patternandvar['variables']
-            where = oh.create_operators(triples, operator_prob, patterns)
-            select = oh.create_select_distinct(operator_prob)
-            choosen_variables = oh.choose_select_variables(variables)
+            where = oh.OperatorHandler().create_operators(triples, operator_prob, patterns)
+            select = oh.OperatorHandler().create_select_distinct(operator_prob)
+            choosen_variables = oh.OperatorHandler().choose_select_variables(variables)
             query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
             all_queries.append(query)
 
