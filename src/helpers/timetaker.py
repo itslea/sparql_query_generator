@@ -13,11 +13,14 @@ class TimeTaker:
         self.logger.level = logging.INFO
         self.message = str(message)
 
-    def starttimer(self):
+    def start_timer(self):
         self.starttime = time.time()
 
-    def stoptimer(self):
+    def stop_timer(self):
         needed_time = time.time() - self.starttime
         message = self.message + ": "+  str(needed_time)
         self.logger.info(message)
         return needed_time
+
+    def message_log(self, message):
+        self.logger.info("ENDPOINT DATA: " + str(message))

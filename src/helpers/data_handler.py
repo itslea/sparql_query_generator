@@ -6,7 +6,7 @@ import requests
 class DataHandler:
     """Handles HTTP requests sent to SPARQL endpoint"""
     def __init__(self):
-        self.adress = 'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
+        self.adress = 'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
         self.default_graph_uri = 'default-graph-uri='
         self.timeout = str(0)
         self.total_time = 0
@@ -197,6 +197,6 @@ class DataHandler:
         print(first_shape, second_shape)
         return {"first": {"shape": first_shape, "patterns": first_patterns}, "second": {"shape": second_shape, "patterns": second_patterns}, "connection": choosen_object}
 
-    def get_total_time(self):
-        """Gets total time"""
-        return str(round(self.total_time, 5))
+    # def get_total_time(self):
+    #     """Gets total time"""
+    #     return str(round(self.total_time, 5))
