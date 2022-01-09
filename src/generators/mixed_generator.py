@@ -17,7 +17,6 @@ def create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, 
 
     con_var = "?connect"
     con_is_var = random.random() <= var_prob
-    #print("Con is var: ", con_is_var)
 
     if endpoint_data_first['shape'] == "star_subject":
         patterns_and_var = create_triple_patterns_subject(endpoint_data_first['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
@@ -47,7 +46,6 @@ def create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, 
     patterns += patterns_and_var2['patterns']
     variables += patterns_and_var2['variables']
 
-    # print("CREATE_TRIPLE_PATTERNS:  ", patterns)
     return {"patterns": patterns, "variables": variables}
 
 
@@ -232,9 +230,7 @@ def generate_query(queries, triples, operator_prob, var_prob):
         endpoint_data_first = endpoint_data_result['first']
         endpoint_data_second = endpoint_data_result['second']
         endpoint_data = endpoint_data_first['patterns'] + endpoint_data_second['patterns']
-        # print(endpoint_data)
         if len(endpoint_data) >= triples:
-            #print("ENDPOINT DATA: ", endpoint_data)
             connection = endpoint_data_result['connection']
             patternandvar = create_triple_patterns(endpoint_data_first, endpoint_data_second, var_prob, connection)
             patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
@@ -244,5 +240,4 @@ def generate_query(queries, triples, operator_prob, var_prob):
             choosen_variables = oh.OperatorHandler().choose_select_variables(variables)
             query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
             all_queries.append(query)
-    # total_time = timer() - start_time
     return all_queries if len(all_queries) == queries else None

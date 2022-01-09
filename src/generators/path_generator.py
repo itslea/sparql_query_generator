@@ -67,7 +67,6 @@ def generate_query(queries, triples, operator_prob, var_prob):
         query = ''
         endpoint_data = dh.DataHandler().fetch_data_path(triples)
         if len(endpoint_data) >= triples:
-            timelogger.message_log(endpoint_data)
             patternandvar = create_triple_patterns(endpoint_data, var_prob)
             patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
             variables = patternandvar['variables']
