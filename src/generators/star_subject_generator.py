@@ -51,13 +51,13 @@ def generate_query(queries, triples, operator_prob, var_prob):
     """Generates query."""
     all_queries = []
     try_counter = 0
-    limit_tries = 100
+    limit_tries = 1000
     while len(all_queries) < queries:
         if try_counter > limit_tries:
             break
         try_counter += 1
         query = ''
-        endpoint_data = dh.DataHandler().fetch_data_subject(triples)
+        endpoint_data = dh.DataHandler().fetch_data_subject(triples, False)
         if len(endpoint_data) >= triples:
             patternandvar = create_triple_patterns(endpoint_data, var_prob)
             patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n

@@ -220,7 +220,7 @@ def generate_query(queries, triples, operator_prob, var_prob):
     """Generates query."""
     all_queries = []
     try_counter = 0
-    limit_tries = 100
+    limit_tries = 1000
     while len(all_queries) < queries:
         if try_counter > limit_tries:
             break

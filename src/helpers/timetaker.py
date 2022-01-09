@@ -19,7 +19,7 @@ class TimeTaker:
 
     def stop_timer(self):
         needed_time = time.time() - self.starttime
-        message = self.message + ": "+  str(needed_time)
+        message = self.message + ": " + str(needed_time)
         self.logger.info(message)
         return needed_time
 

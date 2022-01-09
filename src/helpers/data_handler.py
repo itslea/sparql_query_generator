@@ -19,7 +19,7 @@ class DataHandler:
         if choosen_object['type'] == 'uri':
             object_type = '<' + choosen_object['value'] + '>'
         elif choosen_object['type'] == 'literal':
-            if choosen_object['xml:lang'] is not None:
+            if 'xml:lang' in choosen_object:
                 object_type = '\"' + choosen_object['value'] + '\"' + "@" + choosen_object['xml:lang']
             else:
                 object_type = '\"' + choosen_object['value']
