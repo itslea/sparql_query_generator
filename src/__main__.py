@@ -3,52 +3,48 @@ import generators.star_subject_generator as ssg
 import generators.star_object_generator as sog
 import generators.path_generator as pg
 import generators.mixed_generator as mg
-from helpers.data_handler import DataHandler
 import helpers.timetaker as tt 
-import helpers.graph_creator as gg
 from timeit import default_timer as timer
 
-queries = 10
-triples_per_query = 40
+queries = 1
+triples_per_query = 5
 triples_per_query_max = 5
-timelog = tt.TimeTaker("MixedGen")
+timelog = tt.TimeTaker()
 none_counter = 0
+gen_name = "Star-Subject"
 
+gen_queries = []
 
-mg_query = mg.generate_query(queries, triples_per_query, 0.5, 0.5)
-print(mg_query)
-# second_query.encode('utf-8')
-# second_result = requests.get('https://dbpedia.org/sparql', params={'format': 'json', 'query': second_query})
-# second_data = second_result.json()
-# print(second_data)
-
-ssg_queries = []
-
+# execution time of generation of queries
 while triples_per_query >= triples_per_query_max:
-    # timelog.start_timer()
-    start_time = timer()
-    mg_query = mg.generate_query(queries, triples_per_query, 0.5, 0.5)
-    # print(mg_query)
-    if mg_query is None:
+    timelog.start_timer()
+    ssg_query = ssg.generate_query(queries, triples_per_query, 0.5, 0.1)
+    if ssg_query is None:
         none_counter += 1
-        print("uff")
         if none_counter == 2:
             print("Vorzeitig beendet")
             break
     else:
-        exec_time = timer() - start_time
+        exec_time = timelog.stop_timer("generation", triples_per_query, gen_name)
         print(exec_time)
-        ssg_queries.append(mg_query)
+        for query in ssg_query:
+            gen_queries.append({"query": query, "triples": triples_per_query})
         triples_per_query -= 5
     print("ein while durchlauf zu ende")
 
-second_query = ssg_queries[0][0]
-second_query.encode('utf-8')
-second_timer = timer()
-second_result = requests.get('https://dbpedia.org/sparql', params={'format': 'json', 'query': second_query})
-second_data = second_result.json()
-print("Query exec: ", timer() - second_timer)
+print(gen_queries)
 
-# ssg_query = ssg.generate_query(queries, triples_per_query, 0.5, 0.5)
-# sog_query = sog.generate_query(queries, triples_per_query, 0.5, 0.5)
-# pq = pg.generate_query(queries, triples_per_query, 0.5, 0.5)
+# execution time of sending queries back to endpoint + number of answers produced by it
+for elem in gen_queries:
+    print("Vorher: " + elem['query'])
+    ev_query = elem['query'].encode('utf-8')
+    timelog.start_timer()
+    ev_request = requests.get('https://dbpedia.org/sparql', params={'format': 'json', 'query': ev_query})
+    print(ev_request)
+    ev_time = timelog.stop_timer("execution", elem['triples'], gen_name)
+    ev_result = ev_request.json()
+    # print(ev_result)
+    ev_answers = len(ev_result['results']['bindings'])  # anzahl der antworten pro query
+    timelog.message_log(elem['triples'], " answers: " + str(ev_answers))
+
+

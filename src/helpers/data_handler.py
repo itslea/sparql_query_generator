@@ -6,7 +6,7 @@ import requests
 class DataHandler:
     """Handles HTTP requests sent to SPARQL endpoint"""
     def __init__(self):
-        self.adress =  'https://dbpedia.org/sparql' #  'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
+        self.adress =  'http://localhost:8890/sparql' #'https://dbpedia.org/sparql' #'https://dbpedia.org/sparql' #  'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
         self.default_graph_uri = 'default-graph-uri='
         self.timeout = str(0)
         self.total_time = 0
@@ -19,15 +19,20 @@ class DataHandler:
         if choosen_object['type'] == 'uri':
             object_type = '<' + choosen_object['value'] + '>'
         elif choosen_object['type'] == 'literal':
+            quote = '\''
+            if "\'" in choosen_object['value']:
+                quote = '\"'
+                print("HALLOOOOOOO")
             if 'xml:lang' in choosen_object:
-                object_type = '\"' + choosen_object['value'] + '\"' + "@" + choosen_object['xml:lang']
+                object_type = quote + choosen_object['value'] + quote + "@" + choosen_object['xml:lang']
             else:
-                object_type = '\"' + choosen_object['value']
+                object_type = quote + choosen_object['value'] + quote
+            print(object_type)
         elif choosen_object['type'] == 'typed-literal':
             if choosen_object['datatype'] == 'http://www.w3.org/2001/XMLSchema#integer':
                 object_type = str(choosen_object['value'])
             else:
-                object_type = '\"' + choosen_object['value'] + '\"' + "^^<" + choosen_object['datatype'] + ">"
+                object_type = "\'" + choosen_object['value'] + "\'" + "^^<" + choosen_object['datatype'] + ">"
 
         return object_type
 
