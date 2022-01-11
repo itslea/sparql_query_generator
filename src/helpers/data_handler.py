@@ -6,7 +6,7 @@ import requests
 class DataHandler:
     """Handles HTTP requests sent to SPARQL endpoint"""
     def __init__(self):
-        self.adress =  'http://localhost:8890/sparql' #'https://dbpedia.org/sparql' #'https://dbpedia.org/sparql' #  'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
+        self.adress = 'http://localhost:8890/sparql?' #'https://dbpedia.org/sparql' #'https://dbpedia.org/sparql' #  'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
         self.default_graph_uri = 'default-graph-uri='
         self.timeout = str(0)
         self.total_time = 0
@@ -16,23 +16,25 @@ class DataHandler:
         """Returns corresponding string representation of an object"""
 
         object_type = ""
+        # print("Choosen object: ", choosen_object)
         if choosen_object['type'] == 'uri':
             object_type = '<' + choosen_object['value'] + '>'
         elif choosen_object['type'] == 'literal':
-            quote = '\''
-            if "\'" in choosen_object['value']:
-                quote = '\"'
-                print("HALLOOOOOOO")
+            if "\"" in choosen_object['value']:
+                print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL\n\n\n")
+                print("VORHER: ", choosen_object['value'])
+                choosen_object['value'] = str(choosen_object['value']).replace("\"", "\\\"")
+                print("NACHHER: ", choosen_object['value'])
             if 'xml:lang' in choosen_object:
-                object_type = quote + choosen_object['value'] + quote + "@" + choosen_object['xml:lang']
+                object_type = "\"" + choosen_object['value'] + "\"" + "@" + choosen_object['xml:lang']
             else:
-                object_type = quote + choosen_object['value'] + quote
-            print(object_type)
+                object_type = "\"" + choosen_object['value'] + "\""
+            print("AM ENDE: ", object_type)
         elif choosen_object['type'] == 'typed-literal':
             if choosen_object['datatype'] == 'http://www.w3.org/2001/XMLSchema#integer':
                 object_type = str(choosen_object['value'])
             else:
-                object_type = "\'" + choosen_object['value'] + "\'" + "^^<" + choosen_object['datatype'] + ">"
+                object_type = "\"" + str(choosen_object['value']) + "\"" + "^^<" + str(choosen_object['datatype']) + ">"
 
         return object_type
 

@@ -15,7 +15,10 @@ class OperatorHandler:
         if choose_all == "all":
             choosen_variables = "*"
         else:
-            random_variables = random.sample(variables, k=random.randint(1, len(variables)))
+            var_size = len(variables)
+            if len(variables) > 10:
+                var_size = 10
+            random_variables = random.sample(variables, k=random.randint(1, var_size)) # k=random.randint(1, len(variables)) if you want to be able to select all variables
             for elem in random_variables:
                 if not random_variables.index(elem) == len(random_variables) - 1:
                     choosen_variables += elem + ", "

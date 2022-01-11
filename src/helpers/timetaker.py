@@ -14,11 +14,11 @@ class TimeTaker:
     def start_timer(self):
         self.starttime = timer()
 
-    def stop_timer(self, type, triples, gen_name):
+    def stop_timer(self):
         needed_time = timer() - self.starttime
-        message = gen_name + " " + type +  " time of " + str(triples) + " triples: " + str(needed_time)
-        self.logger.info(message)
+        # message = gen_name + " " + type +  " time of " + str(triples) + " triples: " + str(needed_time)
+        # self.logger.info(message)
         return needed_time
 
-    def message_log(self, triples, message):
-        self.logger.info("Execution time of " + str(triples) + ": " + str(message))
+    def message_log(self, gen_type, triples, gen_time, ev_time, answers):
+        self.logger.info(gen_type + ", "+ str(triples) + " triples --> Gen: " + str(gen_time) + ", Ev: " + str(ev_time) + ", Answers: " + str(answers))

@@ -44,7 +44,6 @@ def create_triple_patterns(endpoint_data, var_prob):
 
         patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
 
-    print("PATTERNS: ", patterns)
     return {"patterns": patterns, "variables": variables}
 
 
