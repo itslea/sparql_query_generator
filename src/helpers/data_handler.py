@@ -6,7 +6,7 @@ import requests
 class DataHandler:
     """Handles HTTP requests sent to SPARQL endpoint"""
     def __init__(self):
-        self.adress = 'http://localhost:8890/sparql?' #'https://dbpedia.org/sparql' #'https://dbpedia.org/sparql' #  'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
+        self.adress = 'https://dbpedia.org/sparql' #'https://dbpedia.org/sparql' #'https://dbpedia.org/sparql' #  'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
         self.default_graph_uri = 'default-graph-uri='
         self.timeout = str(0)
         self.total_time = 0

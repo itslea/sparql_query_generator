@@ -20,54 +20,44 @@ from timeit import default_timer as timer
 # ev_answers = len(ev_result['results']['bindings'])  # anzahl der antworten pro query
 
 
-queries = 10
+queries = 1
 triples_per_query = 10
 triples_per_query_max = 5
 timelog = tt.TimeTaker()
 none_counter = 0
 gen_name = "Star-Subject"
 
-gen_queries = []
+# gen_queries = []
 
 # execution time of generation of queries
 while triples_per_query >= triples_per_query_max:
-    timelog.start_timer()
-    ssg_query = ssg.generate_query(queries, triples_per_query, 0.5, 0.5)
-    if ssg_query is None:
-        none_counter += 1
-        if none_counter == 2:
-            print("Vorzeitig beendet")
-            break
-    else:
-        exec_time = timelog.stop_timer()
-        # print(exec_time)
-        for query in ssg_query:
-            gen_queries.append({"query": query, "triples": triples_per_query, "exectime": str(exec_time)})
-        triples_per_query -= 5
-    # print("ein while durchlauf zu ende")
-
-# print(gen_queries)
-
-# execution time of sending queries back to endpoint + number of answers produced by it
-for elem in gen_queries:
-    # print("Vorher: " + elem['query'])
-    ev_query = str(elem['query'])
-    # else:
-    timelog.start_timer()
-    ev_request = requests.get('https://dbpedia.org/sparql', params={'format': 'json', 'query': ev_query})
-    # print(ev_request)
-    ev_time = timelog.stop_timer()
-    ev_result = ev_request.json()
-    if ("^^" in str(elem['query']) and len(ev_result['results']['bindings']) == 0) or len(ev_result['results']['bindings']) == 0: # TODO: es fehlen dann aber queries, weil die einfach ausgelassen werden
-        print("AUSGELASSEN:", elem['query'])
-        print(ev_request.headers)
-        print("AUSGELASSEN:", ev_request)
-        print("AUSGELASSEN:", ev_result)
-    # print(ev_result)
-    ev_answers = len(ev_result['results']['bindings'])  # anzahl der antworten pro query
-    timelog.message_log(gen_name, elem['triples'], elem['exectime'], ev_time, ev_answers)
-    # if ev_answers == 0:
-    #     print(ev_query)
-    #     print(ev_result)
-    #     print(ev_request.content)
-    #     print("\n")
+    i = 0
+    while i < 10:
+        timelog.start_timer()
+        ssg_query = sog.generate_query(queries, triples_per_query, 0.5, 0.5)
+        if ssg_query is None:
+            none_counter += 1
+            if none_counter == 2:
+                print("Vorzeitig beendet, break")
+                break
+        else:
+            exec_time = timelog.stop_timer()
+            # print(exec_time)
+            for query in ssg_query:
+                # gen_queries.append({"query": query, "triples": triples_per_query, "exectime": str(exec_time / queries)})
+                ev_query = str(query)
+                timelog.start_timer()
+                ev_request = requests.get('https://dbpedia.org/sparql', params={'format': 'json', 'query': ev_query})
+                print(ev_request)
+                ev_time = timelog.stop_timer()
+                ev_result = ev_request.json()
+                if ("^^" in ev_query and len(ev_result['results']['bindings']) == 0) or len(ev_result['results']['bindings']) == 0: # TODO: es fehlen dann aber queries, weil die einfach ausgelassen werden
+                    print("AUSGELASSEN:", ev_query)
+                    print(ev_request.headers)
+                    print("AUSGELASSEN:", ev_request)
+                    print("AUSGELASSEN:", ev_result)
+                else:
+                    ev_answers = len(ev_result['results']['bindings'])
+                    timelog.message_log(gen_name, triples_per_query, exec_time, ev_time, ev_answers)
+                    i += 1
+    triples_per_query -= 5
