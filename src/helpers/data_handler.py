@@ -21,15 +21,15 @@ class DataHandler:
             object_type = '<' + choosen_object['value'] + '>'
         elif choosen_object['type'] == 'literal':
             if "\"" in choosen_object['value']:
-                print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL\n\n\n")
-                print("VORHER: ", choosen_object['value'])
+                #print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL\n\n\n")
+                #print("VORHER: ", choosen_object['value'])
                 choosen_object['value'] = str(choosen_object['value']).replace("\"", "\\\"")
-                print("NACHHER: ", choosen_object['value'])
+                #print("NACHHER: ", choosen_object['value'])
             if 'xml:lang' in choosen_object:
                 object_type = "\"" + choosen_object['value'] + "\"" + "@" + choosen_object['xml:lang']
             else:
                 object_type = "\"" + choosen_object['value'] + "\""
-            print("AM ENDE: ", object_type)
+            #print("AM ENDE: ", object_type)
         elif choosen_object['type'] == 'typed-literal':
             if choosen_object['datatype'] == 'http://www.w3.org/2001/XMLSchema#integer':
                 object_type = str(choosen_object['value'])
