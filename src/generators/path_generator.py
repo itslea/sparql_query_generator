@@ -7,7 +7,7 @@ import helpers.time_taker as tt
 class PathGenerator:
     """Creates path shaped SPARQL queries"""
     def __init__(self, endpoint_url):
-        self.url =  endpoint_url
+        self.url = endpoint_url
 
     def create_triple_patterns(self, endpoint_data, var_prob):
         """Creates the basic shape of the query while replacing constants with

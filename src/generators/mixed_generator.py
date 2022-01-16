@@ -115,7 +115,8 @@ class MixedGenerator:
         if objectt == connection:
             if con_is_var:
                 objectt = con_var
-                variables.append(objectt)
+                if con_var not in variables:
+                    variables.append(objectt)
             else:
                 objectt = dh.DataHandler(self.url).get_object_string(objectt)
         else:
@@ -139,7 +140,8 @@ class MixedGenerator:
             if elem['s'] == connection:
                 if con_is_var:
                     subject = con_var
-                    variables.append(subject)
+                    if con_var not in variables:
+                        variables.append(subject)
                 else:
                     if subject['type'] == 'uri':
                         subject = '<' + subject['value'] + '>'
