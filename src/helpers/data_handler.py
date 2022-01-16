@@ -4,32 +4,25 @@ import requests
 
 
 class DataHandler:
-    """Handles HTTP requests sent to SPARQL endpoint"""
-    def __init__(self):
-        self.adress = 'https://dbpedia.org/sparql' #'https://dbpedia.org/sparql' #'https://dbpedia.org/sparql' #  'http://192.168.1.24:8890/sparql?' #'https://dbpedia.org/sparql'  # 'http://localhost:8890/sparql?'
-        self.default_graph_uri = 'default-graph-uri='
-        self.timeout = str(0)
-        self.total_time = 0
+    """Handles HTTP requests sent to the SPARQL endpoint"""
+
+    def __init__(self, url):
+        self.url =  url
         self.limit = 100
 
     def get_object_string(self, choosen_object):
         """Returns corresponding string representation of an object"""
 
         object_type = ""
-        # print("Choosen object: ", choosen_object)
         if choosen_object['type'] == 'uri':
             object_type = '<' + choosen_object['value'] + '>'
         elif choosen_object['type'] == 'literal':
             if "\"" in choosen_object['value']:
-                #print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL\n\n\n")
-                #print("VORHER: ", choosen_object['value'])
                 choosen_object['value'] = str(choosen_object['value']).replace("\"", "\\\"")
-                #print("NACHHER: ", choosen_object['value'])
             if 'xml:lang' in choosen_object:
                 object_type = "\"" + choosen_object['value'] + "\"" + "@" + choosen_object['xml:lang']
             else:
                 object_type = "\"" + choosen_object['value'] + "\""
-            #print("AM ENDE: ", object_type)
         elif choosen_object['type'] == 'typed-literal':
             if choosen_object['datatype'] == 'http://www.w3.org/2001/XMLSchema#integer':
                 object_type = str(choosen_object['value'])
@@ -42,7 +35,7 @@ class DataHandler:
         """Fetches predicates and objects to given subject from the endpoint"""
 
         second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . }"
-        second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
+        second_result = requests.get(self.url, params={'format': 'json', 'query': second_query})
         second_data = second_result.json()
         pando = second_data['results']['bindings']
 
@@ -61,7 +54,7 @@ class DataHandler:
 
         object_type = self.get_object_string(choosen_object)
         second_query = "SELECT DISTINCT ?s, ?p FROM <http://dbpedia.org> WHERE {?s ?p " + object_type + " .} LIMIT " + str(self.limit)
-        second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
+        second_result = requests.get(self.url, params={'format': 'json', 'query': second_query})
         second_data = second_result.json()
         pands = second_data['results']['bindings']
         patterns = []
@@ -80,7 +73,7 @@ class DataHandler:
         loopcounter = 0
         while loopcounter < triples:
             second_query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o .} LIMIT " + str(self.limit)
-            second_result = requests.get(self.adress, params={'format': 'json', 'query': second_query})
+            second_result = requests.get(self.url, params={'format': 'json', 'query': second_query})
             if second_result.status_code != 200:
                 break
             second_data = second_result.json()
@@ -105,12 +98,7 @@ class DataHandler:
 
         #  Gets subject that fulfills minimum shape criteria
         query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o1. ?s ?p2 ?o2. FILTER(?o1 != ?o2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o1))} LIMIT " + str(self.limit)
-        start_time = time.time()
-        result = requests.get(self.adress, params={'format': 'json', 'query': query})
-        end_time = time.time()
-        needed_time = end_time - start_time
-        self.total_time += needed_time
-
+        result = requests.get(self.url, params={'format': 'json', 'query': query})
         endpoint_data = result.json()
         s = random.randint(0, self.limit - 1)
         choosen_subject = endpoint_data['results']['bindings'][s]['s']
@@ -125,12 +113,7 @@ class DataHandler:
 
         #  Gets object that fulfills minimum shape criteria
         query = "SELECT DISTINCT * FROM <http://dbpedia.org> WHERE {?s1 ?p1 ?o. ?s2 ?p2 ?o. FILTER(?p1 != rdf:type && ?p2 != rdf:type) FILTER(?s1 != ?s2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s1, ?p1, ?o))} LIMIT " + str(self.limit)
-        start_time = time.time()
-        result = requests.get(self.adress, params={'format': 'json', 'query': query})
-        end_time = time.time()
-        needed_time = end_time - start_time
-        self.total_time += needed_time
-
+        result = requests.get(self.url, params={'format': 'json', 'query': query})
         endpoint_data = result.json()
         o = random.randint(0, self.limit - 1)
         choosen_object = endpoint_data['results']['bindings'][o]['o']
@@ -144,13 +127,7 @@ class DataHandler:
             self.limit = triples
 
         query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o. ?o ?p2 ?o2. FILTER(?p1 != ?p2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o))} LIMIT " + str(self.limit)
-        start_time = time.time()
-        result = requests.get(self.adress, params={'format': 'json', 'query': query})
-
-        end_time = time.time()
-        needed_time = end_time - start_time
-        self.total_time += needed_time
-
+        result = requests.get(self.url, params={'format': 'json', 'query': query})
         endpoint_data = result.json()
         s = random.randint(0, self.limit - 1)
         choosen_subject = endpoint_data['results']['bindings'][s]['s']

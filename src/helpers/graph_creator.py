@@ -1,40 +1,56 @@
 from matplotlib import colors
 import matplotlib.pyplot as plt
+import pandas as pd
+from matplotlib import ticker
 from numpy import array
 
 #Init params like double, arr, double, arr, double, arr
 
 class Graph_Creator:
-    def __init__(self, sog_time, sog_info, ssg_time, ssg_info, pg_time, pg_info):
-        self.sog_time = sog_time
-        self.sog_info = sog_info
-        self.ssg_time = ssg_time
-        self.ssg_info = ssg_info
-        self.pg_time = pg_time
-        self.pg_info = pg_info
+    """Creates the graphs for the evaluation metrics"""
 
-        self.time_collection = [self.sog_time, self.ssg_time, self.pg_time]
-        self.label_collection = []
-        self.info = ""
-        for info in sog_info:
-            self.info = self.info + " " + info
-        self.label_collection.append(str(self.info))
+    def create_generation_graph(self, x_ssg, y_ssg, x_sog, y_sog, x_pg, y_pg, x_mg, y_mg):
+        plt.plot(x_ssg, y_ssg, label = "Star-Subject Generator", color = 'purple', marker = 'o', markersize = 8)
+        plt.plot([3, 0], [0, 4], label = "Star-Object Generator", color = 'orange', marker = 'o', markersize = 6)
+        plt.plot([0, 1], [1, 0], label = "Path Generator", color = 'green', marker = 'o', markersize = 6)
+        plt.plot([1, 0], [2, 0], label = "Mixed Generator", color = 'blue', marker = 'o', markersize = 6)
 
-        self.info = ""
-        for info in ssg_info:
-            self.info = self.info + " " + info
-        self.label_collection.append(str(self.info))
+        # plt.plot(x_sog, y_sog, label = "Star-Object Generator", color = 'orange', marker = 'o', markersize = 6)
+        # plt.plot(x_pg, y_pg, label = "Path Generator", color = 'green', marker = 'o', markersize = 6)
+        # plt.plot(x_mg, y_mg, label = "Mixed Generator", color = 'blue', marker = 'o', markersize = 6)
 
-        self.info = ""
-        for info in pg_info:
-            self.info = self.info + " " + info
-        self.label_collection.append(str(self.info))
-        #label_collection kann alle Informationen der Graphen enthalten und halt dementsprechen auch in der Anzeige genutzt werden
-        #aktuell noch nicht in gebrauch
-        plt.title("Required time of the generators")
-        plt.xlabel("Generators")
-        plt.ylabel("Time")
-        plt.bar(["Star-Subject\n" + str(self.time_collection[0]) + "s","Star-Object\n"+ str(self.time_collection[1]) + "s","Path-Generator\n" + str(self.time_collection[1]) + "s"], self.time_collection, color=('red', 'green', 'blue'), width=0.2) 
+        plt.xlabel('triples per query')
+        plt.ylabel('generation time (sec)')
+        plt.title('Generation time of queries')
+        plt.legend()
+        plt.savefig('gen_time.png')
 
-        plt.show()
+    def create_evaluation_graph(self, x_ssg, y_ssg, x_sog, y_sog, x_pg, y_pg, x_mg, y_mg):
+        plt.plot(x_ssg, y_ssg, label = "Star-Subject Generator", color = 'purple', marker = 'o', markersize = 6)
+        plt.plot([3, 0], [0, 4], label = "Star-Object Generator", color = 'orange', marker = 'o', markersize = 6)
+        plt.plot([0, 1], [1, 0], label = "Path Generator", color = 'green', marker = 'o', markersize = 6)
+        plt.plot([1, 0], [2, 0], label = "Mixed Generator", color = 'blue', marker = 'o', markersize = 6)
+
+        # plt.plot(x_sog, y_sog, label = "Star-Object Generator", color = 'orange', marker = 'o', markersize = 6)
+        # plt.plot(x_pg, y_pg, label = "Path Generator", color = 'green', marker = 'o', markersize = 6)
+        # plt.plot(x_mg, y_mg, label = "Mixed Generator", color = 'blue', marker = 'o', markersize = 6)
+
+        plt.xlabel('triples per query')
+        plt.ylabel('request time (sec)')
+        plt.title('Request time of generated queries')
+        plt.legend()
+        plt.savefig('ev_time.png')
+
+    def create_answers_graph(self, x_ssg, y_ssg, x_sog, y_sog, x_pg, y_pg, x_mg, y_mg):
+        df = pd.DataFrame({'Star-Subject Generator':y_ssg, 'Star_Object Generator': y_sog, 'Path Generator': y_pg, 'Mixed Generator': y_mg})
+        df.index = x_ssg
+        df.plot(kind = 'bar')
+
+        plt.ylabel('answers produced')
+        plt.gca().yaxis.set_major_formatter(ticker.Formatter('$%.2f'))
+        plt.gca().xaxis.set_tick_params(rotation = 0)
+
+        plt.title('Answers produced by generated queries')
+        plt.legend()
+        plt.savefig('answer_number.png')
 
