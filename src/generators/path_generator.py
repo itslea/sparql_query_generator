@@ -20,6 +20,7 @@ class PathGenerator:
         variables = []
 
         is_first = endpoint_data[0]
+        print(is_first)
         temp_var = "?o"
         path_is_var = random.random() <= var_prob
 
@@ -62,13 +63,13 @@ class PathGenerator:
         """Generates query."""
         all_queries = []
         try_counter = 0
-        limit_tries = 100
+        limit_tries = 5000
         while len(all_queries) < queries:
             if try_counter > limit_tries:
                 break
             try_counter += 1
             query = ''
-            endpoint_data = dh.DataHandler(self.url).fetch_data_path(triples)
+            endpoint_data = dh.DataHandler(self.url).fetch_data_path(triples, False)
             if len(endpoint_data) >= triples:
                 patternandvar = self.create_triple_patterns(endpoint_data, var_prob)
                 patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
@@ -78,4 +79,6 @@ class PathGenerator:
                 choosen_variables = oh.OperatorHandler().choose_select_variables(variables)
                 query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
                 all_queries.append(query)
+                print(endpoint_data)
+            print(try_counter)
         return all_queries

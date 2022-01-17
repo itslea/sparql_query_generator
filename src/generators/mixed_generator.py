@@ -7,7 +7,7 @@ import helpers.time_taker as tt
 class MixedGenerator:
     """Creates mixed queries by randomly concatenating two of the three shape-types (star-subject, star-object, path)"""
     def __init__(self, endpoint_url):
-        self.url =  endpoint_url
+        self.url = endpoint_url
 
     def create_triple_patterns(self, endpoint_data_first, endpoint_data_second, var_prob, connection):
         """Creates the basic shape of the query while replacing constants with
@@ -21,6 +21,8 @@ class MixedGenerator:
 
         con_var = "?connect"
         con_is_var = random.random() <= var_prob
+        if con_is_var:
+            variables.append(con_var)
 
         if endpoint_data_first['shape'] == "star_subject":
             patterns_and_var = self.create_triple_patterns_subject(endpoint_data_first['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
@@ -63,7 +65,6 @@ class MixedGenerator:
         if subject == connection:
             if con_is_var:
                 subject = con_var
-                variables.append(subject)
             else:
                 if subject['type'] == 'uri':
                     subject = '<' + subject['value'] + '>'
@@ -89,7 +90,6 @@ class MixedGenerator:
             if elem['o'] == connection:
                 if con_is_var:
                     objectt = con_var
-                    variables.append(objectt)
                 else:
                     objectt = dh.DataHandler(self.url).get_object_string(objectt)
             else:
@@ -115,8 +115,6 @@ class MixedGenerator:
         if objectt == connection:
             if con_is_var:
                 objectt = con_var
-                if con_var not in variables:
-                    variables.append(objectt)
             else:
                 objectt = dh.DataHandler(self.url).get_object_string(objectt)
         else:
@@ -140,8 +138,6 @@ class MixedGenerator:
             if elem['s'] == connection:
                 if con_is_var:
                     subject = con_var
-                    if con_var not in variables:
-                        variables.append(subject)
                 else:
                     if subject['type'] == 'uri':
                         subject = '<' + subject['value'] + '>'
@@ -178,7 +174,6 @@ class MixedGenerator:
                 if elem['s'] == connection:
                     if con_is_var:
                         subject = con_var
-                        variables.append(subject)
                     else:
                         if subject['type'] == 'uri':
                             subject = '<' + subject['value'] + '>'
@@ -203,7 +198,6 @@ class MixedGenerator:
             if elem['o'] == connection:
                 if con_is_var:
                     objectt = con_var
-                    variables.append(objectt)
                 else:
                     objectt = dh.DataHandler(self.url).get_object_string(objectt)
             elif path_is_var:

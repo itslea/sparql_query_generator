@@ -21,4 +21,7 @@ class TimeTaker:
         return needed_time
 
     def message_log(self, gen_type, triples, gen_time, ev_time, answers):
-        self.logger.info(gen_type + ", "+ str(triples) + " triples --> Gen: " + str(gen_time) + ", Ev: " + str(ev_time) + ", Answers: " + str(answers))
+        self.logger.info(gen_type + ", " + str(triples) + " triples --> Gen: " + str(gen_time) + ", Ev: " + str(ev_time) + ", Answers: " + str(answers))
+
+    def add_log(self, message):
+        self.logger.info(message)
