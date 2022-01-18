@@ -11,7 +11,7 @@ class Graph_Creator:
         plt.plot(x_index, y_pg, label="Path Generator", color='green', marker='o', markersize=4)
         plt.plot(x_index, y_mg, label="Mixed Generator", color='blue', marker='o', markersize=4)
 
-        plt.xlabel('triples per query')
+        plt.xlabel('triple patterns per query')
         plt.ylabel('generation time (sec)')
         plt.title('Generation time of queries')
         plt.legend()
@@ -24,7 +24,7 @@ class Graph_Creator:
         plt.plot(x_index, y_pg, label="Path Generator", color='green', marker='o', markersize=4)
         plt.plot(x_index, y_mg, label="Mixed Generator", color='blue', marker='o', markersize=4)
 
-        plt.xlabel('triples per query')
+        plt.xlabel('triple patterns per query')
         plt.ylabel('request time (sec)')
         plt.title('Request time of generated queries')
         plt.legend()
@@ -36,6 +36,7 @@ class Graph_Creator:
         df.index = x_index
         df.plot(kind='bar', stacked=True, color=['purple', 'orange', 'green', 'blue'])
 
+        plt.xlabel('triple patterns per query')
         plt.ylabel('number of answers produced')
         plt.title('Answers produced by generated queries')
         plt.legend()
