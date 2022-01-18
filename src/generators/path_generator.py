@@ -63,7 +63,7 @@ class PathGenerator:
         """Generates query."""
         all_queries = []
         try_counter = 0
-        limit_tries = 5000
+        limit_tries = 10000
         while len(all_queries) < queries:
             if try_counter > limit_tries:
                 break

@@ -15,12 +15,11 @@ dir_path = os.path.dirname(__file__)
 # query = pg.PathGenerator(endpoint_url).generate_query(1, 25, 0.5, 0.5)
 # print(query)
 
-queries = 5
+queries = 10
 triples_per_query = 2
 triples_per_query_max = 20  # 10
 triples_step = 2
 timelog = tt.TimeTaker()
-none_counter = 0
 x_index = list(range(triples_per_query, triples_per_query_max + triples_step, triples_step))
 
 # --------------------- SUBJECT ---------------------
@@ -38,10 +37,7 @@ while triples_per_query <= triples_per_query_max:
         timelog.start_timer()
         gen_query = ssg.StarSubjectGenerator(endpoint_url).generate_query(1, triples_per_query, 0.5, 0.5)
         if gen_query is None:
-            none_counter += 1
-            if none_counter == 2:
-                print("Vorzeitig beendet, break")
-                break
+            break
         else:
             exec_time = timelog.stop_timer()
             # print(exec_time)
@@ -96,10 +92,7 @@ while triples_per_query <= triples_per_query_max:
         timelog.start_timer()
         gen_query = sog.StarObjectGenerator(endpoint_url).generate_query(1, triples_per_query, 0.5, 0.5)
         if gen_query is None:
-            none_counter += 1
-            if none_counter == 2:
-                print("Vorzeitig beendet, break")
-                break
+            break
         else:
             exec_time = timelog.stop_timer()
             # print(exec_time)
@@ -154,10 +147,7 @@ while triples_per_query <= triples_per_query_max:
         timelog.start_timer()
         gen_query = pg.PathGenerator(endpoint_url).generate_query(1, triples_per_query, 0.5, 0.5)
         if gen_query is None:
-            none_counter += 1
-            if none_counter == 2:
-                print("Vorzeitig beendet, break")
-                break
+            break
         else:
             exec_time = timelog.stop_timer()
             # print(exec_time)
@@ -216,10 +206,7 @@ while triples_per_query <= triples_per_query_max:
         timelog.start_timer()
         gen_query = mg.MixedGenerator(endpoint_url).generate_query(1, triples_per_query, 0.5, 0.5)
         if gen_query is None:
-            none_counter += 1
-            if none_counter == 2:
-                print("Vorzeitig beendet, break")
-                break
+            break
         else:
             exec_time = timelog.stop_timer()
             # print(exec_time)
@@ -277,10 +264,10 @@ gc.Graph_Creator().create_answers_graph(x_index, y_answers_ssg, y_answers_sog, y
 
 # gc.Graph_Creator().create_evaluation_graph(x_index, y_ev_ssg, y_ev_sog, y_ev_pg, y_ev_mg)
 
-# y_answers_ssg = [0.019325200000000153, 0.1969510000000021, 0.09373589999999865, 0.7447933999999918, 0.8692357000000044, 0.7197749000000044, 0.7948807999999872, 2.4181901999999695, 1.7210011000000804, 1.9349771000000828]
-# y_answers_sog = [0.12130760000013652, 0.4248233999999229, 0.433659999999918, 0.5670482000000447, 0.5378825000000234, 2.7613800999999967, 1.2566928000001099, 0.5118390999996336, 53.67777100000012, 62.46001100000012]
-# y_answers_pg = [0.16346999999996115, 0.013109399999848392, 0.8231983000000582, 0.13343639999993684, 0.8788864999996804, 0.7249760999998216, 0.5151095000001078, 4.3485610999996425, 1.0440162999993845, 0.34165609999945445]
-# y_answers_mg = [None, 0.31367119999999993, 0.037512400000011326, 0.6444377999999915, 0.0975945000000138, 1.055790600000023, 1.367515400000002, 4.005718499999944, 34.89313510000011, 0.843095500000345]
+# y_answers_ssg = [153, 21, 865, 918, 44, 44, 872, 295, 104, 1828]
+# y_answers_sog = [652, 229, 918, 447, 234, 9967, 1099, 336, 12, 612]
+# y_answers_pg = [165, 392, 582, 3684, 6804, 216, 78, 6425, 45, 5445]
+# y_answers_mg = [None, 12, 2, 120, 356, 4534, 367, 57, 8933, 843]
 
 # gc.Graph_Creator().create_answers_graph(x_index, y_answers_ssg, y_answers_sog, y_answers_pg, y_answers_mg)
 
