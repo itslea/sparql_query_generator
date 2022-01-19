@@ -1,5 +1,4 @@
 import random
-import time
 import requests
 
 
@@ -225,7 +224,6 @@ class DataHandler:
         second_shape = random.choice(choose_shape)
         first_triples = random.randint(2, triples - 2)
         second_triples = triples - first_triples
-        # print(first_triples, second_triples)
 
         first_patterns = []
         second_patterns = []
@@ -246,24 +244,12 @@ class DataHandler:
             if len(first_patterns) >= 2:
                 choosen_object = first_patterns[len(first_patterns) - 1]['o']
 
-        # print("First-Patterns: ", first_patterns)
-
-        #print(choosen_object)
-
         if len(first_patterns) >= 2:
-            # print("Choosen object: ", choosen_object)
             if second_shape == "star_subject":
                 second_patterns = self.fetch_subject(second_triples, choosen_object, False)
             elif second_shape == "star_object":
                 second_patterns = self.fetch_object(second_triples, choosen_object)
             elif second_shape == "path":
                 second_patterns = self.fetch_path(second_triples, choosen_object, False)
-            # print("Second-Patterns: ", second_patterns)
 
-        print(first_shape, second_shape)
-        # print(first_patterns, second_patterns)
         return {"first": {"shape": first_shape, "patterns": first_patterns}, "second": {"shape": second_shape, "patterns": second_patterns}, "connection": choosen_object}
-
-    # def get_total_time(self):
-    #     """Gets total time"""
-    #     return str(round(self.total_time, 5))

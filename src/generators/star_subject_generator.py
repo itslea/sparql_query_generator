@@ -1,16 +1,15 @@
 import random
-import time
-from timeit import default_timer as timer
 import helpers.data_handler as dh
 import helpers.operator_handler as oh
-import helpers.time_taker as tt 
+
 
 class StarSubjectGenerator:
     """Creates star-subject shaped SPARQL queries"""
-    def __init__(self, endpoint_url):
-        self.url =  endpoint_url
 
-    def create_triple_patterns(self, endpoint_data, var_prob):
+    def __init__(self, endpoint_url):
+        self.url = endpoint_url
+
+    def create_triple_patterns(self, data, var_prob):
         """Creates the basic shape of the query while replacing constants with
         variables according to the variable probability"""
 
@@ -20,38 +19,39 @@ class StarSubjectGenerator:
         patterns = []
         variables = []
 
-        subject = endpoint_data[0]['s']
+        subject = data[0]['s']
         if random.random() <= var_prob:
-            subject = '?s'
+            subject = "?s"
             variables.append(subject)
         else:
-            if subject['type'] == 'uri':
-                subject = '<' + subject['value'] + '>'
+            if subject['type'] == "uri":
+                subject = "<" + subject['value'] + ">"
 
-        for elem in endpoint_data:
+        for elem in data:
             predicate = elem['p']
             objectt = elem['o']
 
             if random.random() <= var_prob:
-                predicate = '?p' + str(pred_var_counter)
+                predicate = "?p" + str(pred_var_counter)
                 variables.append(predicate)
                 pred_var_counter += 1
             else:
-                predicate = '<' + predicate['value'] + '>'
+                predicate = "<" + predicate['value'] + ">"
 
             if random.random() <= var_prob:
-                objectt = '?o' + str(obj_var_counter)
+                objectt = "?o" + str(obj_var_counter)
                 variables.append(objectt)
                 obj_var_counter += 1
             else:
                 objectt = dh.DataHandler(self.url).get_object_string(objectt)
 
-            patterns.append(subject + ' ' + predicate + ' ' + objectt + ' .')
+            patterns.append(subject + " " + predicate + " " + objectt + " .")
 
-        return {"patterns": patterns, "variables": variables}
+        return {'patterns': patterns, 'variables': variables}
 
     def generate_query(self, queries, triples, operator_prob, var_prob):
         """Generates query."""
+
         all_queries = []
         try_counter = 0
         limit_tries = 10000
@@ -59,7 +59,7 @@ class StarSubjectGenerator:
             if try_counter > limit_tries:
                 break
             try_counter += 1
-            query = ''
+            query = ""
             endpoint_data = dh.DataHandler(self.url).fetch_data_subject(triples, False)
             if len(endpoint_data) >= triples:
                 patternandvar = self.create_triple_patterns(endpoint_data, var_prob)

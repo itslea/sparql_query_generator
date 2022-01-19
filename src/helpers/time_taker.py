@@ -1,6 +1,7 @@
 from timeit import default_timer as timer
 import logging
 
+
 class TimeTaker:
     """Calculates execution time of a function and writes the calculated time in a log file"""
 
@@ -16,8 +17,6 @@ class TimeTaker:
 
     def stop_timer(self):
         needed_time = timer() - self.starttime
-        # message = gen_name + " " + type +  " time of " + str(triples) + " triples: " + str(needed_time)
-        # self.logger.info(message)
         return needed_time
 
     def message_log(self, gen_type, triples, gen_time, ev_time, answers):
