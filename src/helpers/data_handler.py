@@ -3,14 +3,14 @@ import requests
 
 
 class DataHandler:
-    """Handles HTTP requests sent to the SPARQL endpoint"""
+    """Handles HTTP requests sent to the SPARQL endpoint and fetches data for triple patterns."""
 
     def __init__(self, url):
         self.url = url
         self.limit = 100
 
     def get_object_string(self, choosen_object):
-        """Returns corresponding string representation of an object"""
+        """Returns corresponding string representation of an object."""
 
         object_type = ""
         if choosen_object['type'] == 'uri':
@@ -31,7 +31,7 @@ class DataHandler:
         return object_type
 
     def fetch_subject(self, triples, choosen_subject, object_is_uri):  # subject = entire json object (incl. type and value)
-        """Fetches predicates and objects to given subject from the endpoint"""
+        """Fetches predicates and objects to given subject from the endpoint."""
 
         if triples > 100:
             self.limit = triples
@@ -56,7 +56,7 @@ class DataHandler:
         return patterns
 
     def fetch_object(self, triples, choosen_object):
-        """Fetches subjects and predicates to given object from endpoint"""
+        """Fetches subjects and predicates to given object from endpoint."""
 
         if triples > 100:
             self.limit = triples
@@ -87,7 +87,7 @@ class DataHandler:
 
         patterns = []
         loopcounter = 0
-        while loopcounter < triples:
+        while loopcounter < triples:  # sends as many HTTP requests as needed to fulfill requested number of triple patterns
             query = "SELECT DISTINCT ?p, ?o FROM <http://dbpedia.org> WHERE { <" + choosen_subject['value'] + "> ?p ?o . ?o ?p2 ?o2 . FILTER(?p != <http://xmlns.com/foaf/0.1/primaryTopic>) } LIMIT " + str(self.limit)
             result = requests.get(self.url, params={'format': 'json', 'query': query})
             if result.status_code != 200:
@@ -95,15 +95,14 @@ class DataHandler:
                 print(result.reason)
                 break
             data = result.json()
-            pando = data['results']['bindings']
-            len_pando = len(pando)
-            if len_pando <= 0:
+            pando = data['results']['bindings']  # pando = p(redicate) and o(bject)
+            if len(pando) <= 0:
                 break
             pando_uri = []
             for elem in pando:
                 if elem['o']['type'] == "uri":
                     pando_uri.append(elem)
-            if len(pando_uri) <= 0:
+            if len(pando_uri) <= 0:  # objects need to be URIs in order to be used as a subject for the next triple pattern
                 break
             select_pando_pointer = random.randint(0, len(pando_uri) - 1)
             new_obj = {"s": choosen_subject, "p": pando[select_pando_pointer]['p'], "o": pando[select_pando_pointer]['o']}
@@ -112,14 +111,14 @@ class DataHandler:
             loopcounter = loopcounter + 1
         if len(patterns) <= 0:
             return []
-        pattern_end = self.fetch_path_end(triples, patterns[len(patterns) - 1]['o'], obj_is_uri)
+        pattern_end = self.fetch_path_end(triples, patterns[len(patterns) - 1]['o'], obj_is_uri)  # gets last triple pattern of path
         if len(pattern_end) <= 0:
             return []
         patterns.append(pattern_end)
         return patterns
 
     def fetch_path_end(self, triples, choosen_subject, obj_is_uri):
-        """Fetches path structure to given start-subject from endpoint"""
+        """Fetches path structure to given start-subject from endpoint."""
 
         if triples > 100:
             self.limit = triples
@@ -131,35 +130,34 @@ class DataHandler:
             print(result)
             print(result.reason)
             return []
-        second_data = result.json()
-        pando = second_data['results']['bindings']
-        len_pando = len(pando)
-        if len_pando <= 0:
+        data = result.json()
+        pando = data['results']['bindings']
+        if len(pando) <= 0:
             return []
-        if obj_is_uri:
+        if obj_is_uri:  # makes sure objects are URIs
             pando_uri = []
             for elem in pando:
                 if elem['o']['type'] == "uri":
                     pando_uri.append(elem)
             if len(pando_uri) <= 0:
                 return []
-            select_pando_pointer = random.randint(0, len(pando_uri) - 1)
-            new_obj = {"s": choosen_subject, "p": pando_uri[select_pando_pointer]['p'], "o": pando_uri[select_pando_pointer]['o']}
-            choosen_subject = pando[select_pando_pointer]['o']
+            choose_pando = random.randint(0, len(pando_uri) - 1)
+            new_obj = {"s": choosen_subject, "p": pando_uri[choose_pando]['p'], "o": pando_uri[choose_pando]['o']}
+            choosen_subject = pando[choose_pando]['o']
         else:
-            select_pando_pointer = random.randint(0, len(pando) - 1)
-            new_obj = {"s": choosen_subject, "p": pando[select_pando_pointer]['p'], "o": pando[select_pando_pointer]['o']}
-            choosen_subject = pando[select_pando_pointer]['o']
+            choose_pando = random.randint(0, len(pando) - 1)
+            new_obj = {"s": choosen_subject, "p": pando[choose_pando]['p'], "o": pando[choose_pando]['o']}
+            choosen_subject = pando[choose_pando]['o']
 
         return new_obj
 
     def fetch_data_subject(self, triples, obj_is_uri):
-        """Fetches data from SPARQL endpoint for star-subject-generator"""
+        """Fetches data from SPARQL endpoint for star-subject-generator."""
 
         if triples > 100:
             self.limit = triples
 
-        #  Gets subject that fulfills minimum shape criteria
+        # gets subject that fulfills minimum shape criteria
         query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o1. ?s ?p2 ?o2. FILTER(?o1 != ?o2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o1))} LIMIT " + str(self.limit)
         result = requests.get(self.url, params={'format': 'json', 'query': query})
         if result.status_code != 200:
@@ -173,12 +171,12 @@ class DataHandler:
         return self.fetch_subject(triples, choosen_subject, obj_is_uri)
 
     def fetch_data_object(self, triples):
-        """Fetches data from SPARQL endpoint for star-object-generator"""
+        """Fetches data from SPARQL endpoint for star-object-generator."""
 
         if triples > 100:
             self.limit = triples
 
-        #  Gets object that fulfills minimum shape criteria
+        # gets object that fulfills minimum shape criteria
         query = "SELECT DISTINCT * FROM <http://dbpedia.org> WHERE {?s1 ?p1 ?o. ?s2 ?p2 ?o. FILTER(?p1 != rdf:type && ?p2 != rdf:type) FILTER(?s1 != ?s2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s1, ?p1, ?o))} LIMIT " + str(self.limit)
         result = requests.get(self.url, params={'format': 'json', 'query': query})
         if result.status_code != 200:
@@ -192,11 +190,12 @@ class DataHandler:
         return self.fetch_object(triples, choosen_object)
 
     def fetch_data_path(self, triples, obj_is_uri):
-        """Fetches data from SPARQL endpoint for path-generator"""
+        """Fetches data from SPARQL endpoint for path-generator."""
 
         if triples > 100:
             self.limit = triples
 
+        # gets part of path that fulfills minimum shape criteria
         query = "SELECT DISTINCT ?s FROM <http://dbpedia.org> WHERE {?s ?p1 ?o. ?o ?p2 ?o2. FILTER(?p1 != ?p2) FILTER(1 > <SHORT_OR_LONG::bif:rnd> (1000, ?s, ?p1, ?o)) FILTER(?p1 != <http://xmlns.com/foaf/0.1/primaryTopic>)} LIMIT " + str(self.limit)
         result = requests.get(self.url, params={'format': 'json', 'query': query})
         if result.status_code != 200:
@@ -213,11 +212,12 @@ class DataHandler:
         return patterns
 
     def fetch_data_mixed(self, triples):  # has to be at least 4 triples otherwise it won't work
-        """Fetches data from SPARQL endpoint for star-subject-generator"""
+        """Fetches data from SPARQL endpoint for star-subject-generator."""
 
         if triples > 100:
             self.limit = triples
 
+        # decides which shapes to use and their order
         choose_shape = ["star_subject", "star_object", "path"]
         first_shape = random.choice(choose_shape)
         choose_shape.remove(str(first_shape))
@@ -228,13 +228,15 @@ class DataHandler:
         first_patterns = []
         second_patterns = []
         choosen_object = ""
+
+        # gets data for first shape
         if first_shape == "star_subject":
-            if second_shape == "star_object":  # bei path muss object uri sein
+            if second_shape == "star_object":
                 first_patterns = self.fetch_data_subject(first_triples, False)
-            elif second_shape == "path":
+            elif second_shape == "path":  # last object of star-subject shape has to be an URI
                 first_patterns = self.fetch_data_subject(first_triples, True)
             if len(first_patterns) >= 2:
-                choosen_object = random.choice(first_patterns)['o']
+                choosen_object = random.choice(first_patterns)['o']  # choose connecting object for second shape
         elif first_shape == "star_object":
             first_patterns = self.fetch_data_object(first_triples)
             if len(first_patterns) >= 2:
@@ -244,6 +246,7 @@ class DataHandler:
             if len(first_patterns) >= 2:
                 choosen_object = first_patterns[len(first_patterns) - 1]['o']
 
+        # gets data for second shape
         if len(first_patterns) >= 2:
             if second_shape == "star_subject":
                 second_patterns = self.fetch_subject(second_triples, choosen_object, False)
@@ -251,5 +254,7 @@ class DataHandler:
                 second_patterns = self.fetch_object(second_triples, choosen_object)
             elif second_shape == "path":
                 second_patterns = self.fetch_path(second_triples, choosen_object, False)
+
+        print(choosen_object)
 
         return {"first": {"shape": first_shape, "patterns": first_patterns}, "second": {"shape": second_shape, "patterns": second_patterns}, "connection": choosen_object}

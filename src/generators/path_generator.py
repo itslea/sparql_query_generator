@@ -1,17 +1,19 @@
 import random
 import helpers.data_handler as dh
 import helpers.operator_handler as oh
+import os
 
 
 class PathGenerator:
-    """Creates path shaped SPARQL queries"""
+    """Creates path shaped SPARQL queries."""
 
     def __init__(self, endpoint_url):
         self.url = endpoint_url
+        self.dir_path = os.path.join(os.getcwd(), "src\\queries")
 
     def create_triple_patterns(self, data, var_prob):
         """Creates the basic shape of the query while replacing constants with
-        variables according to the variable probability"""
+        variables according to the variable probability."""
 
         pred_var_counter = 1
         obj_var_counter = 1
@@ -21,7 +23,7 @@ class PathGenerator:
 
         is_first = data[0]
         temp_var = "?o"
-        path_is_var = random.random() <= var_prob
+        path_is_var = random.random() <= var_prob  # makes sure path connecting constants (object and then subject) are both either variable or not
 
         for elem in data:
             subject = elem['s']
@@ -44,7 +46,7 @@ class PathGenerator:
             else:
                 predicate = "<" + predicate['value'] + ">"
 
-            path_is_var = random.random() <= var_prob
+            path_is_var = random.random() <= var_prob  # new variable decision for next part of path
 
             if path_is_var:
                 objectt = "?o" + str(obj_var_counter)
@@ -59,7 +61,7 @@ class PathGenerator:
         return {'patterns': patterns, 'variables': variables}
 
     def generate_query(self, queries, triples, operator_prob, var_prob):
-        """Generates query."""
+        """Generates entire query."""
 
         all_queries = []
         try_counter = 0
@@ -72,11 +74,18 @@ class PathGenerator:
             endpoint_data = dh.DataHandler(self.url).fetch_data_path(triples, False)
             if len(endpoint_data) >= triples:
                 patternandvar = self.create_triple_patterns(endpoint_data, var_prob)
-                patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
-                variables = patternandvar['variables']
+                patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns
+                variables = patternandvar['variables']  # contains all variables used in triple pattern creation needed for SELECT
                 where = oh.OperatorHandler().create_operators(triples, operator_prob, patterns)
                 select = oh.OperatorHandler().create_select_distinct(operator_prob)
                 choosen_variables = oh.OperatorHandler().choose_select_variables(variables)
                 query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
                 all_queries.append(query)
+
+        query_string = ""
+        for query in all_queries:
+            query_string += str(query) + "\n"
+        with open(os.path.join(self.dir_path, "path_queries.rq"), "w", encoding="utf-8") as file:
+            file.write(query_string)
+
         return all_queries

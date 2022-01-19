@@ -3,10 +3,10 @@ import pandas as pd
 
 
 class GraphCreator:
-    """Creates the graphs for the evaluation metrics"""
+    """Creates the graphs for the evaluation metrics."""
 
     def create_generation_graph(self, x_index, y_ssg, y_sog, y_pg, y_mg):
-        """Creates graph for generation time"""
+        """Creates graph for generation time."""
 
         plt.clf()
         plt.plot(x_index, y_ssg, label="Star-Subject Generator", color='purple', marker='o', markersize=4)
@@ -21,7 +21,7 @@ class GraphCreator:
         plt.savefig("gen_time.png")
 
     def create_evaluation_graph(self, x_index, y_ssg, y_sog, y_pg, y_mg):
-        """Creates graph for execution time on endpoint"""
+        """Creates graph for execution time on endpoint."""
 
         plt.clf()
         plt.plot(x_index, y_ssg, label="Star-Subject Generator", color='purple', marker='o', markersize=4)
@@ -36,7 +36,7 @@ class GraphCreator:
         plt.savefig("ev_time.png")
 
     def create_answers_graph(self, x_index, y_ssg, y_sog, y_pg, y_mg):
-        """Creates graph for numbers of answers produced by queries"""
+        """Creates graph for numbers of answers produced by queries."""
 
         plt.clf()
         df = pd.DataFrame({'Star-Subject Generator': y_ssg, 'Star-Object Generator': y_sog, 'Path Generator': y_pg, 'Mixed Generator': y_mg})

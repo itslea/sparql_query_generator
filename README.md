@@ -2,7 +2,7 @@
 
 Seminar on Knowledge Graphs
 
-## General Query generation (def generate_query(...))
+## Query generation (def generate_query(...))
 
 1. RDF data is fetched in data_handler.py
 2. Data is transformed into triple patterns in def create_triple_patterns(...) and triple constants will be replaced with variables
@@ -17,7 +17,7 @@ The MixedGenerator chooses two of the three shape types in random order (subject
 
 Datatypes like float will be rounded when fetched from the endpoint in JSON serialization (doesn't happen with turtle serialization).
 Example:
-The endpoint returns the following JSON object to given subject <http://dbpedia.org/resource/The_Mall_of_New_Hampshire__The_Mall_of_New_Hampshire__1>:
+The endpoint returns the following JSON object to given subject "<http://dbpedia.org/resource/The_Mall_of_New_Hampshire__The_Mall_of_New_Hampshire__1>":
 
 ```json
 {"p": {"type": "uri", "value": "http://www.w3.org/2003/01/geo/wgs84_pos#long"}, "o": {"type": "typed-literal", "datatype": "http://www.w3.org/2001/XMLSchema#float", "value": "-71.4328"}}

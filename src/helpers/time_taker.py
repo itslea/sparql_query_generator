@@ -3,7 +3,7 @@ import logging
 
 
 class TimeTaker:
-    """Calculates execution time of a function and writes the calculated time in a log file"""
+    """Calculates execution time of a function and writes the calculated time in a log file. Used for evaluation."""
 
     def __init__(self):
         self.logger = logging.getLogger()

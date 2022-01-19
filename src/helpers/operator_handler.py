@@ -2,10 +2,10 @@ import random
 
 
 class OperatorHandler:
-    """Creates the operators used in sparql queries based on given probability"""
+    """Creates the operators used in sparql queries based on given probability."""
 
     def choose_select_variables(self, variables):
-        """Chooses random variables for SELECT (DISTINCT)"""
+        """Chooses random variables for SELECT (DISTINCT)."""
 
         choosen_variables = ""
         all_or_variables = ["all", "variables"]
@@ -17,7 +17,7 @@ class OperatorHandler:
         else:
             var_size = len(variables)
             if len(variables) > 10:
-                var_size = 10
+                var_size = 10  # maximum of 10 selected variables
             random_variables = random.sample(variables, k=random.randint(1, var_size))  # k=random.randint(1, len(variables)) if you want to be able to select all variables
             for elem in random_variables:
                 if not random_variables.index(elem) == len(random_variables) - 1:
@@ -28,14 +28,15 @@ class OperatorHandler:
         return choosen_variables
 
     def create_select_distinct(self, operator_prob):
-        """Creates string for SELECT (DISTINCT)"""
+        """Creates string for SELECT (DISTINCT)."""
+
         if random.random() <= operator_prob:
             return "SELECT DISTINCT"
         else:
             return "SELECT"
 
     def create_union_string(self, union_patterns):
-        """Creates string for UNION operator"""
+        """Creates string for UNION operator."""
 
         union_str = "{ "
         part1_len = random.randint(1, len(union_patterns) - 1)
@@ -50,7 +51,7 @@ class OperatorHandler:
         return union_str
 
     def create_optional_string(self, optional_patterns):
-        """Creates string for OPTIONAL operator"""
+        """Creates string for OPTIONAL operator."""
 
         optional_str = "OPTIONAL { "
         for elem in optional_patterns:
@@ -60,7 +61,8 @@ class OperatorHandler:
         return optional_str
 
     def create_shape_string(self, rest_patterns):
-        """Creates string for SHAPE criteria"""
+        """Creates string for SHAPE criteria."""
+
         rest_str = ""
         for elem in rest_patterns:
             rest_str += elem + " "
@@ -69,10 +71,12 @@ class OperatorHandler:
 
     def create_operators(self, triples, operator_prob, patterns):
         """Creates the operators UNION and DISTINCT."""
+
         where_str = "WHERE { "
         bool_optional = False
         bool_union = False
 
+        # decides which operators to use (or both)
         if triples >= 3:
             if random.random() <= operator_prob:
                 bool_optional = True
@@ -86,11 +90,13 @@ class OperatorHandler:
                 if random.random() <= operator_prob:
                     bool_optional = True
 
+        # case: OPTIONAL and UNION
         if bool_optional and bool_union:
+            # decides if UNION or OPTIONAL should be first in query
             choose_first = ["optional", "union"]
             first = random.choice(choose_first)
 
-            # Divide patterns by 3 -> optional, union, rest
+            # divide patterns by 3 -> optional, union, rest of query
             if first[0] == "optional":
                 o = random.randint(1, triples - 2)
                 u = random.randint(2, triples - o)
@@ -127,7 +133,7 @@ class OperatorHandler:
                     optional_patterns.append(patterns[i])
 
                 where_str += self.create_shape_string(rest_patterns) + self.create_union_string(union_patterns) + self.create_optional_string(optional_patterns)
-
+        # case: OPTIONAL
         elif bool_optional:
             o = random.randint(1, triples)
             r = triples - o
@@ -141,7 +147,7 @@ class OperatorHandler:
                 optional_patterns.append(patterns[i])
 
             where_str += self.create_shape_string(rest_patterns) + self.create_optional_string(optional_patterns)
-
+        # case: UNION
         elif bool_union:
             u = random.randint(2, triples)
             r = triples - u

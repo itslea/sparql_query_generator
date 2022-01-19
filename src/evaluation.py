@@ -51,8 +51,6 @@ while triples_per_query <= triples_per_query_max:
                     print(ev_query)
                     print(ev_request)
                 else:
-                    with open(os.path.join(dir_path, "queries/star_subject_queries.rq"), "a", encoding="utf-8") as text_file:
-                        text_file.write(str(ev_query.encode('utf-8')) + "\n")
                     temp_gen_time.append(exec_time)
                     temp_ev_time.append(ev_time)
                     ev_answers = len(ev_result['results']['bindings'])
@@ -97,9 +95,6 @@ while triples_per_query <= triples_per_query_max:
                 print(ev_request.reason)
                 print(ev_query)
             else:
-                with open(os.path.join(dir_path, "queries/star_object_queries.rq"), "a", encoding="utf-8") as text_file:
-                    text_file.write(str(ev_query.encode('utf-8')) + "\n")
-                print(ev_request)
                 ev_result = ev_request.json()
                 if ("^^" in ev_query and len(ev_result['results']['bindings']) == 0):
                     print(ev_query)
@@ -149,9 +144,6 @@ while triples_per_query <= triples_per_query_max:
                 print(ev_request.reason)
                 print(ev_query)
             else:
-                with open(os.path.join(dir_path, "queries/path_queries.rq"), "a", encoding="utf-8") as text_file:
-                    text_file.write(str(ev_query.encode('utf-8')) + "\n")
-                print(ev_request)
                 ev_result = ev_request.json()
                 if ("^^" in ev_query and len(ev_result['results']['bindings']) == 0):
                     print(ev_query)
@@ -205,9 +197,6 @@ while triples_per_query <= triples_per_query_max:
                 print(ev_request.reason)
                 print(ev_query)
             else:
-                with open(os.path.join(dir_path, "queries/mixed_queries.rq"), "a", encoding="utf-8") as text_file:
-                    text_file.write(str(ev_query.encode('utf-8')) + "\n")
-                print(ev_request)
                 ev_result = ev_request.json()
                 if ("^^" in ev_query and len(ev_result['results']['bindings']) == 0):
                     print(ev_query)

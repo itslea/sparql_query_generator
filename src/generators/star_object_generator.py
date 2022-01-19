@@ -1,26 +1,28 @@
 import random
 import helpers.data_handler as dh
 import helpers.operator_handler as oh
+import os
 
 
 class StarObjectGenerator:
-    """Creates star-object shaped SPARQL queries"""
+    """Creates star-object shaped SPARQL queries."""
 
     def __init__(self, endpoint_url):
         self.url = endpoint_url
+        self.dir_path = os.path.join(os.getcwd(), "src\\queries")
 
     def create_triple_patterns(self, data, var_prob):
         """Creates the basic shape of the query while replacing constants with
-        variables according to the variable probability"""
+        variables according to the variable probability."""
 
         subj_var_counter = 1
         pred_var_counter = 1
 
         patterns = []
         variables = []
-
         objectt = data[0]['o']
-        if random.random() <= var_prob:
+
+        if random.random() <= var_prob:  # decides if object is variable
             objectt = "?o"
             variables.append(objectt)
         else:
@@ -30,14 +32,14 @@ class StarObjectGenerator:
             subject = elem['s']
             predicate = elem['p']
 
-            if random.random() <= var_prob:
+            if random.random() <= var_prob:  # decides if predicate is variable
                 predicate = "?p" + str(pred_var_counter)
                 variables.append(predicate)
                 pred_var_counter += 1
             else:
                 predicate = "<" + predicate['value'] + ">"
 
-            if random.random() <= var_prob:
+            if random.random() <= var_prob:  # decides if subject is variable
                 subject = "?s" + str(subj_var_counter)
                 variables.append(subject)
                 subj_var_counter += 1
@@ -50,7 +52,8 @@ class StarObjectGenerator:
         return {'patterns': patterns, 'variables': variables}
 
     def generate_query(self, queries, triples, operator_prob, var_prob):
-        """Generates query."""
+        """Generates entire query."""
+
         all_queries = []
         try_counter = 0
         limit_tries = 10000
@@ -62,11 +65,18 @@ class StarObjectGenerator:
             endpoint_data = dh.DataHandler(self.url).fetch_data_object(triples)
             if len(endpoint_data) >= triples:
                 patternandvar = self.create_triple_patterns(endpoint_data, var_prob)
-                patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns with size = n
-                variables = patternandvar['variables']
+                patterns = patternandvar['patterns']  # patterns is a list of strings containing the triple patterns
+                variables = patternandvar['variables']  # contains all variables used in triple pattern creation needed for SELECT
                 where = oh.OperatorHandler().create_operators(triples, operator_prob, patterns)
                 select = oh.OperatorHandler().create_select_distinct(operator_prob)
                 choosen_variables = oh.OperatorHandler().choose_select_variables(variables)
                 query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
                 all_queries.append(query)
+
+        query_string = ""
+        for query in all_queries:
+            query_string += str(query) + "\n"
+        with open(os.path.join(self.dir_path, "star_object_queries.rq"), "w", encoding="utf-8") as file:
+            file.write(query_string)
+
         return all_queries
