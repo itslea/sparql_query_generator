@@ -6,10 +6,8 @@ import generators.mixed_generator as mg
 import helpers.time_taker as tt
 import helpers.graph_creator as gc
 import statistics
-import os
 
 endpoint_url = 'http://localhost:8890/sparql?'
-dir_path = os.path.dirname(__file__)
 
 queries = 10
 triples_per_query = 2

@@ -5,7 +5,12 @@ class OperatorHandler:
     """Creates the operators used in sparql queries based on given probability."""
 
     def choose_select_variables(self, variables):
-        """Chooses random variables for SELECT (DISTINCT)."""
+        """Chooses random variables for SELECT (DISTINCT).
+
+        :param variables: list containing variables used in the triple patterns
+
+        :return: returns a list containing choosen variables
+        """
 
         choosen_variables = ""
         all_or_variables = ["all", "variables"]
@@ -28,7 +33,12 @@ class OperatorHandler:
         return choosen_variables
 
     def create_select_distinct(self, operator_prob):
-        """Creates string for SELECT (DISTINCT)."""
+        """Creates string for SELECT (DISTINCT).
+
+        :param operator_prob: probability that operators will be used in the query
+
+        :return: returns SELECT or SELECT DISTINCT string
+        """
 
         if random.random() <= operator_prob:
             return "SELECT DISTINCT"
@@ -36,7 +46,12 @@ class OperatorHandler:
             return "SELECT"
 
     def create_union_string(self, union_patterns):
-        """Creates string for UNION operator."""
+        """Creates string for UNION operator.
+
+        :param union_patterns: list containing patterns used for UNION
+
+        :return: returns the UNION string
+        """
 
         union_str = "{ "
         part1_len = random.randint(1, len(union_patterns) - 1)
@@ -51,7 +66,12 @@ class OperatorHandler:
         return union_str
 
     def create_optional_string(self, optional_patterns):
-        """Creates string for OPTIONAL operator."""
+        """Creates string for OPTIONAL operator.
+        
+        :param optional_patterns: list containing patterns used for OPTIONAL
+
+        :return: returns the OPTIONAL string
+        """
 
         optional_str = "OPTIONAL { "
         for elem in optional_patterns:
@@ -61,7 +81,12 @@ class OperatorHandler:
         return optional_str
 
     def create_shape_string(self, rest_patterns):
-        """Creates string for SHAPE criteria."""
+        """Creates string for SHAPE criteria.
+
+        :param rest_patterns: list containing patterns used neither in OPTIONAL nor UNION
+
+        :return: returns the rest string
+        """
 
         rest_str = ""
         for elem in rest_patterns:
@@ -70,7 +95,14 @@ class OperatorHandler:
         return rest_str
 
     def create_operators(self, triples, operator_prob, patterns):
-        """Creates the operators UNION and DISTINCT."""
+        """Creates the operators UNION and DISTINCT.
+
+        :param triples: number of triple patterns for each query
+        :param operator_prob: probability that operators will be used in the query
+        :param patterns: list containing the triple patterns
+
+        :return: returns entire WHERE string
+        """
 
         where_str = "WHERE { "
         bool_optional = False

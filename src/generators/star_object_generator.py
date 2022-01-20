@@ -13,7 +13,14 @@ class StarObjectGenerator:
 
     def create_triple_patterns(self, data, var_prob):
         """Creates the basic shape of the query while replacing constants with
-        variables according to the variable probability."""
+        variables according to the variable probability.
+
+        :param data: list containing endpoint data
+        :param var_prob: probability to replace triple constants with variables
+
+        :return: returns an object containing a list with triple patterns and a
+                 list with all variables used in the triple patterns
+        """
 
         subj_var_counter = 1
         pred_var_counter = 1
@@ -52,7 +59,15 @@ class StarObjectGenerator:
         return {'patterns': patterns, 'variables': variables}
 
     def generate_query(self, queries, triples, operator_prob, var_prob):
-        """Generates entire query."""
+        """Generates entire query.See also the READ_ME file.
+
+        :param queries: number of queries to be generated
+        :param triples: number of triple patterns for each query
+        :param operator_prob: probability that operators will be used in the query
+        :param var_prob: probability that constants will be replaced with variables
+
+        :return: returns a list containing the queries
+        """
 
         all_queries = []
         try_counter = 0
@@ -73,6 +88,7 @@ class StarObjectGenerator:
                 query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
                 all_queries.append(query)
 
+        # writes all queries to a file in folder 'queries'
         query_string = ""
         for query in all_queries:
             query_string += str(query) + "\n"

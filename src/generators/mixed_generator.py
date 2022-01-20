@@ -13,9 +13,18 @@ class MixedGenerator:
 
     def create_triple_patterns(self, data_first, data_second, var_prob, connection):
         """Creates the basic shape of the query while replacing constants with
-        variables according to the variable probability."""
+        variables according to the variable probability.
 
-        subj_var_counter = 1
+        :param data_first: list containing endpoint data for first shape
+        :param data_second: list containing endpoint data for second shape
+        :param var_prob: probability to replace triple constants with variables
+        :param connection: contains connecting object
+
+        :return: returns an object containing a list with triple patterns and a
+                 list with all variables used in the triple patterns
+        """
+
+        subj_var_counter = 1  # counters make sure that no duplicate variables will be used in the patterns
         pred_var_counter = 1
         obj_var_counter = 1
         patterns = []
@@ -29,15 +38,15 @@ class MixedGenerator:
 
         # creates triple patterns for first shape
         if data_first['shape'] == "star_subject":
-            patterns_and_var = self.create_triple_patterns_subject(data_first['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
+            patterns_and_var = self.create_triple_patterns_subject(data_first['data'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
             pred_var_counter = patterns_and_var['pred_counter']
             obj_var_counter = patterns_and_var['obj_counter']
         elif data_first['shape'] == "star_object":
-            patterns_and_var = self.create_triple_patterns_object(data_first['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, subj_var_counter)
+            patterns_and_var = self.create_triple_patterns_object(data_first['data'], var_prob, connection, con_is_var, con_var, pred_var_counter, subj_var_counter)
             subj_var_counter = patterns_and_var['subj_counter']
             pred_var_counter = patterns_and_var['pred_counter']
         elif data_first['shape'] == "path":
-            patterns_and_var = self.create_triple_patterns_path(data_first['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
+            patterns_and_var = self.create_triple_patterns_path(data_first['data'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
             pred_var_counter = patterns_and_var['pred_counter']
             obj_var_counter = patterns_and_var['obj_counter']
 
@@ -48,11 +57,11 @@ class MixedGenerator:
 
         # creates triple patterns for second shape
         if data_second['shape'] == "star_subject":
-            patterns_and_var2 = self.create_triple_patterns_subject(data_second['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
+            patterns_and_var2 = self.create_triple_patterns_subject(data_second['data'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
         elif data_second['shape'] == "star_object":
-            patterns_and_var2 = self.create_triple_patterns_object(data_second['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, subj_var_counter)
+            patterns_and_var2 = self.create_triple_patterns_object(data_second['data'], var_prob, connection, con_is_var, con_var, pred_var_counter, subj_var_counter)
         elif data_second['shape'] == "path":
-            patterns_and_var2 = self.create_triple_patterns_path(data_second['patterns'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
+            patterns_and_var2 = self.create_triple_patterns_path(data_second['data'], var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter)
 
         patterns += patterns_and_var2['patterns']
         variables += patterns_and_var2['variables']
@@ -61,7 +70,20 @@ class MixedGenerator:
 
     def create_triple_patterns_subject(self, data, var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter):
         """Creates the basic shape of the query while replacing constants with
-        variables according to the variable probability."""
+        variables according to the variable probability.
+
+        :param data: list containing endpoint data
+        :param var_prob: probability to replace triple constants with variables
+        :param connection: contains connecting object
+        :param con_is_var: boolean to check if the connecting object should be a variable
+        :param con_var: variable used for connecting object
+        :param pred_var_counter: counter to avoid duplicate predicate variables
+        :param obj_var_counter: counter to avoid duplicate object varibles
+
+        :return: returns an object containing a list with triple patterns, a
+                 list with all variables used in the triple patterns and predicate and object
+                 variable counter
+        """
 
         patterns = []
         variables = []
@@ -111,7 +133,20 @@ class MixedGenerator:
 
     def create_triple_patterns_object(self, data, var_prob, connection, con_is_var, con_var, pred_var_counter, subj_var_counter):
         """Creates the basic shape of the query while replacing constants with
-        variables according to the variable probability."""
+        variables according to the variable probability.
+
+        :param data: list containing endpoint data
+        :param var_prob: probability to replace triple constants with variables
+        :param connection: contains connecting object
+        :param con_is_var: boolean to check if the connecting object should be a variable
+        :param con_var: variable used for connecting object
+        :param pred_var_counter: counter to avoid duplicate predicate variables
+        :param subj_var_counter: counter to avoid duplicate subject varibles
+
+        :return: returns an object containing a list with triple patterns, a
+                 list with all variables used in the triple patterns and predicate and subject
+                 variable counter
+        """
 
         patterns = []
         variables = []
@@ -161,7 +196,20 @@ class MixedGenerator:
 
     def create_triple_patterns_path(self, data, var_prob, connection, con_is_var, con_var, pred_var_counter, obj_var_counter):
         """Creates the basic shape of the query while replacing constants with
-        variables according to the variable probability."""
+        variables according to the variable probability.
+
+        :param data: list containing endpoint data
+        :param var_prob: probability to replace triple constants with variables
+        :param connection: contains connecting object
+        :param con_is_var: boolean to check if the connecting object should be a variable
+        :param con_var: variable used for connecting object
+        :param pred_var_counter: counter to avoid duplicate predicate variables
+        :param obj_var_counter: counter to avoid duplicate object varibles
+
+        :return: returns an object containing a list with triple patterns, a
+                 list with all variables used in the triple patterns and predicate and object
+                 variable counter
+        """
 
         patterns = []
         variables = []
@@ -218,7 +266,15 @@ class MixedGenerator:
         return {'patterns': patterns, 'variables': variables, 'pred_counter': pred_var_counter, 'obj_counter': obj_var_counter}
 
     def generate_query(self, queries, triples, operator_prob, var_prob):
-        """Generates entire query."""
+        """Generates entire query. See also the READ_ME file.
+
+        :param queries: number of queries to be generated
+        :param triples: number of triple patterns for each query
+        :param operator_prob: probability that operators will be used in the query
+        :param var_prob: probability that constants will be replaced with variables
+
+        :return: returns a list containing the queries
+        """
 
         all_queries = []
         try_counter = 0
@@ -231,7 +287,7 @@ class MixedGenerator:
             endpoint_data_result = dh.DataHandler(self.url).fetch_data_mixed(triples)
             endpoint_data_first = endpoint_data_result['first']  # contains data for first shape
             endpoint_data_second = endpoint_data_result['second']  # contains data for second shape
-            endpoint_data = endpoint_data_first['patterns'] + endpoint_data_second['patterns']
+            endpoint_data = endpoint_data_first['data'] + endpoint_data_second['data']
             print(endpoint_data)
             if len(endpoint_data) >= triples:
                 connection = endpoint_data_result['connection']  # connecting object needed for variable replacement
@@ -244,6 +300,7 @@ class MixedGenerator:
                 query = select + " " + choosen_variables + " FROM <http://dbpedia.org> " + where
                 all_queries.append(query)
 
+        # writes all queries to a file in folder 'queries'
         query_string = ""
         for query in all_queries:
             query_string += str(query) + "\n"
